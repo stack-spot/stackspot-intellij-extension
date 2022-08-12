@@ -1,0 +1,10 @@
+ignore:
+  'SNYK-JAVA-ORGJETBRAINSKOTLIN-2393744':
+    - '*':
+        reason: 'Kotlin vulnerability not treated so far'
+        expires: '2023-12-31'
+
+  'snyk:lic:maven:org.jetbrains.intellij.deps:trove4j:LGPL-2.1':
+    - '*':
+        reason: 'This project is open source'
+        expires: '2023-12-31'
