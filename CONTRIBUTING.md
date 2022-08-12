@@ -31,17 +31,17 @@ This is StackSpot IntelliJ Plugin contributing guide. Please read the following 
 ## **Before you contribute**
 
 ### **Code of Conduct**
-Please follow the [**Code of Conduct**](https://github.com/stack-spot/stackspot-intellij-plugin/blob/main/CODE_OF_CONDUCT.md) in all your interactions with our project.
+Please follow the [**Code of Conduct**](https://github.com/stack-spot/stackspot-intellij-extension/blob/main/CODE_OF_CONDUCT.md) in all your interactions with our project.
 
 ### **Legal**
 As you contribute, keep in mind that the code, docs and other materials submitted to open source projects are usually considered licensed under the same terms as the rest of the work.
 
-- StackSpot IntelliJ Plugin is licensed over [**ASF - Apache License**](https://github.com/stack-spot/stackspot-intellij-plugin/blob/main/LICENSE), version 2, so new files must have the ASL version 2 header. For more information, please check out [**Apache license**](https://www.apache.org/licenses/LICENSE-2.0).
+- StackSpot IntelliJ Plugin is licensed over [**ASF - Apache License**](https://github.com/stack-spot/stackspot-intellij-extension/blob/main/LICENSE), version 2, so new files must have the ASL version 2 header. For more information, please check out [**Apache license**](https://www.apache.org/licenses/LICENSE-2.0).
 
-- You should configure a pre-commit Githook in your local machine, so it will help you not commit files without a license header. Please check out [**more about Githooks**](https://github.com/stack-spot/stackspot-intellij-plugin/blob/main/hooks/README.md).
+- You should configure a pre-commit Githook in your local machine, so it will help you not commit files without a license header. Please check out [**more about Githooks**](https://github.com/stack-spot/stackspot-intellij-extension/blob/main/hooks/README.md).
 
 - All contributions are subject to the [**Developer Certificate of Origin (DCO)**](https://developercertificate.org).
-  When you commit, use the ```**-s** ``` option to include the Signed-off-by line at the end of the commit log message. At the root of this repository, you will find the DCO text verbatim in the [**dco.txt**](https://github.com/stack-spot/stackspot-intellij-plugin/blob/main/dco.txt) file. You should config a pre-push Githook in your local machine to help you not push without DCO Sign Off. For more information, [**check out GitHooks**](https://github.com/stack-spot/stackspot-intellij-plugin/blob/main/hooks/README.md).
+  When you commit, use the ```**-s** ``` option to include the Signed-off-by line at the end of the commit log message. At the root of this repository, you will find the DCO text verbatim in the [**dco.txt**](https://github.com/stack-spot/stackspot-intellij-extension/blob/main/dco.txt) file. You should config a pre-push Githook in your local machine to help you not push without DCO Sign Off. For more information, [**check out GitHooks**](https://github.com/stack-spot/stackspot-intellij-extension/blob/main/hooks/README.md).
 
 ## **Prerequisites**
 
@@ -101,7 +101,7 @@ See the guidelines to submit your changes:
 
 ### **First contribution**
 
-Contributing to a new feature is only allowed in the [**main repository**](https://github.com/stack-spot/stackspot-intellij-plugin).
+Contributing to a new feature is only allowed in the [**main repository**](https://github.com/stack-spot/stackspot-intellij-extension).
 
 ### **Adding a new feature**
 1. Make sure your branch is based on main;
@@ -112,10 +112,10 @@ Contributing to a new feature is only allowed in the [**main repository**](https
 ###  **Before open an issue**
 1. Check out if you are on the latest version. If you’re not, your problem may have been solved already.
 
-2. Search under the project's [**issues**](https://github.com/stack-spot/stackspot-intellij-plugin/issues?q=is%3Aopen+is%3Aissue+label%3Abug) and make sure it’s not a known bug.
+2. Search under the project's [**issues**](https://github.com/stack-spot/stackspot-intellij-extension/issues?q=is%3Aopen+is%3Aissue+label%3Abug) and make sure it’s not a known bug.
 
 ### **Opening a new issue**
-If you can't find an open issue for your bug/problem, please [**open a new one**](https://github.com/stack-spot/stackspot-intellij-plugin/issues/new).
+If you can't find an open issue for your bug/problem, please [**open a new one**](https://github.com/stack-spot/stackspot-intellij-extension/issues/new).
 
 Your issue must have:
 * A clear title and description with relevant information;
