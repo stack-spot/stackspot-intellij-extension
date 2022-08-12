@@ -115,7 +115,7 @@ Contributing to a new feature is only allowed in the [**main repository**](https
 2. Search under the project's [**issues**](https://github.com/stack-spot/stackspot-intellij-extension/issues?q=is%3Aopen+is%3Aissue+label%3Abug) and make sure it’s not a known bug.
 
 ### **Opening a new issue**
-If you can't find an open issue for your bug/problem, please [**open a new one**](https://github.com/stack-spot/stackspot-intellij-extension/issues/new).
+If you can't find an open issue for your bug/problem, please [**open a new one**](https://github.com/stack-spot/stackspot-intellij-extension/issues/new/choose).
 
 Your issue must have:
 * A clear title and description with relevant information;
