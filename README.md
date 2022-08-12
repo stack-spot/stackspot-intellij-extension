@@ -70,19 +70,19 @@ Check our official documentation page to use StackSpot IntelliJ plugin:
 
 ## **Contributing**
 
-Check out our [**Contributing Guide**](https://github.com/stack-spot/stackspot-intellij-plugin/blob/main/CONTRIBUTING.md) to learn about our development process, how to suggest bug fixes and improvements.
+Check out our [**Contributing Guide**](https://github.com/stack-spot/stackspot-intellij-extension/blob/main/CONTRIBUTING.md) to learn about our development process, how to suggest bug fixes and improvements.
 
 Check out other guides:
 
-- [**Security**](https://github.com/stack-spot/stackspot-intellij-plugin/blob/main/SECURITY.md)
+- [**Security**](https://github.com/stack-spot/stackspot-intellij-extension/blob/main/SECURITY.md)
 
-- [**Developer Guide**](https://github.com/stack-spot/stackspot-intellij-plugin/blob/main/DEVELOPER_GUIDE.md)
+- [**Developer Guide**](https://github.com/stack-spot/stackspot-intellij-extension/blob/main/DEVELOPER_GUIDE.md)
 
 ## **Code of Conduct**
-Please follow the [**Code of Conduct**](https://github.com/stack-spot/stackspot-intellij-plugin/blob/main/CODE_OF_CONDUCT.md) in all your interactions with our project.
+Please follow the [**Code of Conduct**](https://github.com/stack-spot/stackspot-intellij-extension/blob/main/CODE_OF_CONDUCT.md) in all your interactions with our project.
 
 ## **License**
-[**Apache License 2.0**](https://github.com/stack-spot/stackspot-intellij-plugin/blob/main/LICENSE).
+[**Apache License 2.0**](https://github.com/stack-spot/stackspot-intellij-extension/blob/main/LICENSE).
 
 ## **Other information**
 
