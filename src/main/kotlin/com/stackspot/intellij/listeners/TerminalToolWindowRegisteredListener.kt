@@ -18,6 +18,7 @@ package com.stackspot.intellij.listeners
 
 import com.intellij.openapi.components.service
 import com.intellij.openapi.module.ModuleManager
+import com.intellij.openapi.module.ModuleType
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.wm.ToolWindowManager
@@ -48,7 +49,7 @@ class TerminalToolWindowRegisteredListener : ToolWindowManagerListener {
                 val projectBasePath = project.basePath ?: return
                 val isInitialized = Path(projectBasePath, Constants.Files.STK_YAML).toFile().exists()
                 val isStackSpotProject = ModuleManager.getInstance(project).modules
-                    .firstOrNull { Constants.MODULE_TYPE == it.moduleTypeName } != null
+                    .firstOrNull { Constants.MODULE_TYPE == ModuleType.get(it).id } != null
 
                 if (isStackSpotProject && !isInitialized) {
                     execCommand(project, service)
