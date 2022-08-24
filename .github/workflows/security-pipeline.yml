@@ -20,7 +20,7 @@ on:
   pull_request:
 
 jobs:
-  SAST:
+  SECURITY:
     runs-on: ubuntu-latest
     steps:
       - name: Change to pending status
@@ -43,7 +43,7 @@ jobs:
           -H 'Accept: application/vnd.github.everest-preview+json' \
           -u ${{ secrets.ACCESS_TOKEN }} \
           --data '{
-                    "event_type": "SAST",
+                    "event_type": "SECURITY",
                     "client_payload": {
                       "ref": "${{ github.ref }}",
                       "ref_name": "${{ github.ref_name }}",
