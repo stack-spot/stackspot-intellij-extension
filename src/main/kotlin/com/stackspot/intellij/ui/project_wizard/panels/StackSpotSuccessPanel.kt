@@ -78,7 +78,7 @@ class StackSpotSuccessPanel(private val parentPanel: StackSpotParentPanel) {
         executor.submit {
             val url = service<GetDocumentationService>().getDocumentationUrl(selectedStackfile?.stack)
             linkPlaceholder.component = url.takeIf { str -> str.isNotEmpty() }?.let {
-                BrowserLink("Read documentation", it)
+                BrowserLink("Read the Stack documentation", it)
             }
         }
         executor.shutdown()
