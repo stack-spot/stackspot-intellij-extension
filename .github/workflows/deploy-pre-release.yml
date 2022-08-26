@@ -28,7 +28,7 @@ jobs:
       - name: Dispatch init event
         run: |
           REPO_NAME=${{ secrets.INTERNAL_REPO_NAME }}
-          STATUSES_HREF=https://api.github.com/repos/$REPO_NAME/statuses/${{ github.event.head_commit.id }}
+          STATUSES_HREF=https://api.github.com/repos/$PUBLIC_REPO_NAME/statuses/${{ github.event.head_commit.id }}
           curl -X POST https://api.github.com/repos/$REPO_NAME/dispatches \
           -H 'Accept: application/vnd.github.everest-preview+json' \
           -u ${{ secrets.ACCESS_TOKEN }} \
