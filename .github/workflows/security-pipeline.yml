@@ -1,5 +1,5 @@
 #
-# Copyright 2020, 2022 ZUP IT SERVICOS EM TECNOLOGIA E INOVACAO SA
+# Copyright 2022 ZUP IT SERVICOS EM TECNOLOGIA E INOVACAO SA
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ jobs:
           -u '${{ secrets.ACCESS_TOKEN }}' \
           --header 'content-type: application/vnd.github+json' \
           -o result.json \
+          --silent \
           --data '{
                     "context": "SECURITY - Check callback",
                     "state": "pending",
@@ -39,9 +40,11 @@ jobs:
 
       - name: Dispatch init event
         run: |
-          curl -X POST https://api.github.com/repos/stack-spot/stackspot-intellij-plugin/dispatches \
+          REPO_NAME=${{ secrets.INTERNAL_REPO_NAME }}
+          curl -X POST https://api.github.com/repos/$REPO_NAME/dispatches \
           -H 'Accept: application/vnd.github.everest-preview+json' \
           -u ${{ secrets.ACCESS_TOKEN }} \
+          --silent \
           --data '{
                     "event_type": "SECURITY",
                     "client_payload": {
@@ -52,4 +55,3 @@ jobs:
                       "statuses_href": "${{ github.event.pull_request._links.statuses.href}}"
                     }
                   }'
-

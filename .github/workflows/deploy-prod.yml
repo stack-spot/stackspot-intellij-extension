@@ -1,5 +1,5 @@
 #
-# Copyright 2020, 2022 ZUP IT SERVICOS EM TECNOLOGIA E INOVACAO SA
+# Copyright 2022 ZUP IT SERVICOS EM TECNOLOGIA E INOVACAO SA
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,39 +18,25 @@ name: Deploy production
 
 on:
   push:
-    branches:
+    tags:
       - v*.*.*
 
 jobs:
-  VERSION:
+  DISPATCH_EVENT:
     runs-on: ubuntu-latest
     steps:
-      - name: Change to pending status
-        run: |
-          curl --request POST \
-          --url ${{ github.event.pull_request._links.statuses.href}} \
-          -u '${{ secrets.ACCESS_TOKEN }}' \
-          --header 'content-type: application/vnd.github+json' \
-          -o result.json \
-          --data '{
-                    "context": "TAG - Check callback",
-                    "state": "pending",
-                    "description": "Waiting to start",
-                    "target_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-                  }'
-
       - name: Dispatch init event
         run: |
-          curl -X POST https://api.github.com/repos/stack-spot/stackspot-intellij-plugin/dispatches \
+          REPO_NAME=${{ secrets.INTERNAL_REPO_NAME }}
+          curl -X POST https://api.github.com/repos/$REPO_NAME/dispatches \
           -H 'Accept: application/vnd.github.everest-preview+json' \
           -u ${{ secrets.ACCESS_TOKEN }} \
+          -o response.json \
+          --silent \
           --data '{
                     "event_type": "TAG",
                     "client_payload": {
                       "ref": "${{ github.ref }}",
-                      "ref_name": "${{ github.ref_name }}",
-                      "repository_owner": "${{ github.repository_owner }}",
-                      "repository_name": "${{ github.event.repository.name }}",
-                      "statuses_href": "${{ github.event.pull_request._links.statuses.href}}"
+                      "statuses_href": "https://api.github.com/repos/$REPO_NAME/statuses/${{ github.event.head_commit.id }}"
                     }
                   }'
