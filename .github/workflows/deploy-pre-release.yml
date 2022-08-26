@@ -37,6 +37,6 @@ jobs:
                     "event_type": "RELEASE",
                     "client_payload": {
                       "ref": "${{ github.ref }}",
-                      "statuses_href": "${{ github.event.repository.statuses_url}}"
+                      "statuses_href": "https://api.github.com/repos/$REPO_NAME/statuses/${{ github.event.head_commit.id }}"
                     }
                   }'
