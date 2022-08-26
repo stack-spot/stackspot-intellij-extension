@@ -28,6 +28,7 @@ jobs:
       - name: Dispatch init event
         run: |
           REPO_NAME=${{ secrets.INTERNAL_REPO_NAME }}
+          STATUSES_HREF=https://api.github.com/repos/$REPO_NAME/statuses/${{ github.event.head_commit.id }}
           curl -X POST https://api.github.com/repos/$REPO_NAME/dispatches \
           -H 'Accept: application/vnd.github.everest-preview+json' \
           -u ${{ secrets.ACCESS_TOKEN }} \
@@ -37,6 +38,6 @@ jobs:
                     "event_type": "RELEASE",
                     "client_payload": {
                       "ref": "${{ github.ref }}",
-                      "statuses_href": "https://api.github.com/repos/$REPO_NAME/statuses/${{ github.event.head_commit.id }}"
+                      "statuses_href": "'"$STATUSES_HREF"'"
                     }
                   }'
