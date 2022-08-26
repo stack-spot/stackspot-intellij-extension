@@ -24,7 +24,6 @@ jobs:
   CHECK_CALLBACK:
     runs-on: ubuntu-latest
     steps:
-
       - name: Callback - ${{ github.event.client_payload.state }}
         if: contains(fromJson('["pending", "success", "failure"]'), github.event.client_payload.state)
         run: |
@@ -33,13 +32,13 @@ jobs:
           -u '${{ secrets.ACCESS_TOKEN }}' \
           --header 'content-type: application/vnd.github+json' \
           -o result.json \
+          --silent \
           --data '{
                     "context": "${{ github.event.action }} - Check callback",
                     "state": "${{ github.event.client_payload.state }}",
                     "description": "${{ github.event.client_payload.description }}",
                     "target_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
                   }'
-
 
       - name: Intenal error ❌
         if: ${{ failure() && github.event.client_payload.state != 'failure'}}
@@ -49,6 +48,7 @@ jobs:
           -u '${{ secrets.ACCESS_TOKEN }}' \
           --header 'content-type: application/vnd.github+json' \
           -o error.json \
+          --silent \
           --data '{
                     "context": "${{ github.event.action }} - Check callback",
                     "state": "error",
