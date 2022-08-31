@@ -38,10 +38,5 @@ object Constants {
         val USER_HOME: Path = Path(System.getProperty("user.home"))
         val STK_HOME: Path = USER_HOME.resolve(".stk")
         val STK_BIN: Path = STK_HOME.resolve("bin")
-        val STACKS_DIR: Path = if (STK_HOME.resolve("stacks").exists()) {
-            STK_HOME.resolve("stacks")
-        } else {
-            STK_HOME.resolve("plugins")
-        }
     }
 }
