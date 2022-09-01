@@ -5,7 +5,7 @@ object InputDialog {
 }
 
 object ErrorDialog {
-    const val URL_IS_NOT_VALID_MESSAGE = "Insert a stack repository URL"
+    const val URL_IS_NOT_VALID_MESSAGE = "Requested URL is not valid"
     const val URL_IS_NOT_VALID_TITLE = "Invalid URL"
 }
 

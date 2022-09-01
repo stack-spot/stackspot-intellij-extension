@@ -67,7 +67,7 @@ class StackSpotNoStackfilesErrorPanel(val parentPanel: StackSpotParentPanel) {
     private fun runImportStack() {
         val url = askForStackUrl() ?: return
 
-        if (url.isUrlValid()) {
+        if (!url.isUrlValid()) {
             Messages.showErrorDialog(URL_IS_NOT_VALID_MESSAGE, URL_IS_NOT_VALID_TITLE)
             return
         }

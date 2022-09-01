@@ -35,7 +35,7 @@ class ImportStackAction : AnAction(IMPORT_STACK, IMPORT_STACK, Icons.IMPORT_STAC
     override fun actionPerformed(e: AnActionEvent) {
         val stackUrl = askForStackUrl() ?: return
 
-        if (stackUrl.isUrlValid()) {
+        if (!stackUrl.isUrlValid()) {
             Messages.showErrorDialog(ErrorDialog.URL_IS_NOT_VALID_MESSAGE, ErrorDialog.URL_IS_NOT_VALID_TITLE)
             return
         }
