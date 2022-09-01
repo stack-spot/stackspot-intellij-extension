@@ -31,16 +31,18 @@
          Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-description -->
     <description>
         <![CDATA[
-            <p>Stackspot's plugin for JetBrains helps you import and use Stacks from your IDE. It allows you to create projects without changing your tool during development. It has an exclusive menu and an easy interface.</p>
+            <html>
+                <p>Stackspot's plugin for JetBrains helps you import and use Stacks from your IDE. It allows you to create projects without changing your tool during development. It has an exclusive menu and an easy interface.</p>
 
-            <p><b>Features:</b></p>
-            <p>StackSpot's Extension for IDE gives you a better view of your project's Stacks, Stackfiles, and Plugins. You can also:</p>
-            <ul>
-              <li>Import Stacks and apply Plugins without using STK CLI.</li>
-              <li>Create projects with Stacks.</li>
-              <li>Apply Plugins to your projects.</li>
-              <li>Use STK CLI on IntelliJ's terminal.</li>
-            </ul>
+                <p><b>Features:</b></p>
+                <p>StackSpot's Extension for IDE gives you a better view of your project's Stacks, Stackfiles, and Plugins. You can also:</p>
+                <ul>
+                  <li>Import Stacks and apply Plugins without using STK CLI.</li>
+                  <li>Create projects with Stacks.</li>
+                  <li>Apply Plugins to your projects.</li>
+                  <li>Use STK CLI on IntelliJ's terminal.</li>
+                </ul>
+            </html>
         ]]>
     </description>
 
