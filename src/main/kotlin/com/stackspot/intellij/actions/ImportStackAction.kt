@@ -22,6 +22,9 @@ import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.ui.Messages
 import com.stackspot.intellij.commands.listeners.NotifyStacksUpdatedCommandListener
 import com.stackspot.intellij.commands.stk.ImportStack
+import com.stackspot.intellij.commons.ErrorDialog
+import com.stackspot.intellij.commons.InputDialog.REPOSITORY_URL
+import com.stackspot.intellij.commons.isUrlValid
 import com.stackspot.intellij.ui.Icons
 import com.stackspot.intellij.ui.StackSpotTerminalRunner
 
@@ -30,14 +33,20 @@ const val IMPORT_STACK = "Import Stack"
 
 class ImportStackAction : AnAction(IMPORT_STACK, IMPORT_STACK, Icons.IMPORT_STACK), DumbAware {
     override fun actionPerformed(e: AnActionEvent) {
-        val stackUrl = askForStackUrl()
+        val stackUrl = askForStackUrl() ?: return
+
+        if (stackUrl.isUrlValid()) {
+            Messages.showErrorDialog(ErrorDialog.URL_IS_NOT_VALID_MESSAGE, ErrorDialog.URL_IS_NOT_VALID_TITLE)
+            return
+        }
+
         val project = e.project
-        if (stackUrl != null && project != null) {
+        if (project != null) {
             ImportStack(stackUrl, StackSpotTerminalRunner(project)).run(NotifyStacksUpdatedCommandListener())
         }
     }
 
     private fun askForStackUrl(): String? {
-        return Messages.showInputDialog("Enter Stack GIT URL To Import", IMPORT_STACK, Messages.getQuestionIcon())
+        return Messages.showInputDialog(REPOSITORY_URL, IMPORT_STACK, Messages.getQuestionIcon())
     }
 }
