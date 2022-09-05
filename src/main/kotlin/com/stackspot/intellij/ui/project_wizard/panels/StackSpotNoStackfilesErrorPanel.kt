@@ -37,7 +37,7 @@ class StackSpotNoStackfilesErrorPanel(val parentPanel: StackSpotParentPanel) {
         return panel {
             row {
                 text(
-                    "In order to create a StackSpot project, you need to have stacks imported.",
+                    "In order to create a StackSpot project, you need to have stacks imported with <b>stackfiles.</b>",
                     maxLineLength = 80
                 )
             }

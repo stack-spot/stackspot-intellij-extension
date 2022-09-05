@@ -37,7 +37,7 @@ class CreateProjectService {
         get() {
             return if (!Constants.Paths.STK_BIN.exists()) {
                 ProjectWizardState.NOT_INSTALLED
-            } else if (ImportedStacks().list().isEmpty()) {
+            } else if (!ImportedStacks().hasStackFiles()) {
                 ProjectWizardState.STACKFILES_EMPTY
             } else if (!isGitConfigOk()) {
                 ProjectWizardState.GIT_CONFIG_NOT_OK

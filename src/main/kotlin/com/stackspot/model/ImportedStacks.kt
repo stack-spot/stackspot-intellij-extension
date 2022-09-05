@@ -23,6 +23,8 @@ import kotlin.io.path.exists
 
 class ImportedStacks {
 
+    fun hasStackFiles() = list().any { it.listStackfiles().isNotEmpty() }
+
     fun list(): List<Stack> {
         val stacksDir = getStacksDirPath().toFile()
         return stacksDir.walk().filter {
