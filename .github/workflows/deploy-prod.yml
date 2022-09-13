@@ -17,9 +17,8 @@
 name: Deploy production
 
 on:
-  push:
-    tags:
-      - v*.*.*
+  release:
+    types: [released]
 
 jobs:
   DISPATCH_EVENT:
@@ -36,7 +35,7 @@ jobs:
           -o response.json \
           --silent \
           --data '{
-                    "event_type": "TAG",
+                    "event_type": "RELEASED",
                     "client_payload": {
                       "ref": "${{ github.ref }}",
                       "statuses_href": "'"$STATUSES_HREF"'"
