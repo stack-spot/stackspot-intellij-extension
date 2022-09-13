@@ -1,28 +1,50 @@
+fun properties(key: String) = project.findProperty(key).toString()
+
 plugins {
     id("java")
+    id("jacoco")
     id("org.jetbrains.kotlin.jvm") version "1.7.10"
     id("org.jetbrains.intellij") version "1.8.0"
+    id("org.sonarqube") version "3.4.0.2513"
 }
 
-group = "com.stackspot"
-version = System.getProperty("project_version")
+val projectVersion: String? = System.getProperty("project_version")
+
+group = properties("pluginGroup")
+version = if (projectVersion.isNullOrEmpty()) {
+    properties("pluginVersion")
+} else {
+    projectVersion
+}
 
 repositories {
     mavenCentral()
 }
 
+kotlin {
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of(11))
+    }
+}
+
 // Configure Gradle IntelliJ Plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
 intellij {
-    version.set("2022.1")
-    type.set("IC") // Target IDE Platform
+    pluginName.set(properties("pluginName"))
+    version.set(properties("platformVersion"))
+    type.set(properties("platformType")) // Target IDE Platform
 
     plugins.set(
-        listOf(
-            "org.jetbrains.plugins.terminal",
-            "com.intellij.gradle",
-            "org.jetbrains.idea.maven",
-        )
+        properties("platformPlugins")
+            .split(',')
+            .map(String::trim)
+            .filter(String::isNotEmpty)
     )
+}
+
+sonarqube {
+    properties {
+        property("sonar.projectName", "ide-intellij-plugin")
+    }
 }
 
 tasks {
@@ -31,13 +53,22 @@ tasks {
         sourceCompatibility = "11"
         targetCompatibility = "11"
     }
+
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
         kotlinOptions.jvmTarget = "11"
     }
 
+    buildSearchableOptions {
+        enabled = false
+    }
+
+    wrapper {
+        gradleVersion = properties("gradleVersion")
+    }
+
     patchPluginXml {
-        sinceBuild.set("221")
-        untilBuild.set("222.*")
+        sinceBuild.set(properties("pluginSinceBuild"))
+        untilBuild.set(properties("pluginUntilBuild"))
     }
 
     signPlugin {
@@ -48,5 +79,16 @@ tasks {
 
     publishPlugin {
         token.set(System.getenv("PUBLISH_TOKEN"))
+    }
+
+    test {
+        finalizedBy(jacocoTestReport)
+    }
+
+    jacocoTestReport {
+        dependsOn(test)
+        reports {
+            xml.required.set(true)
+        }
     }
 }
