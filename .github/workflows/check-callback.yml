@@ -61,7 +61,5 @@ jobs:
     uses: stack-spot/stackspot-intellij-extension/.github/workflows/publish-release.yml@main
     secrets:
       ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-      INTERNAL_REPO_NAME: ${{ secrets.INTERNAL_REPO_NAME }}
-      PUBLIC_REPO_NAME: ${{ secrets.PUBLIC_REPO_NAME }}
       PUBLISH_TOKEN: ${{ secrets.PUBLISH_TOKEN }}
       CHANNEL: ${{ secrets.CHANNEL }}

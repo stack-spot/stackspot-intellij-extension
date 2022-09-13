@@ -21,10 +21,6 @@ on:
     secrets:
       ACCESS_TOKEN:
         required: true
-      INTERNAL_REPO_NAME:
-        required: true
-      PUBLIC_REPO_NAME:
-        required: true
       PUBLISH_TOKEN:
         required: true
       CHANNEL:
