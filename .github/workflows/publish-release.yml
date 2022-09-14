@@ -31,7 +31,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  EXPORT_PROPERTIES:
+  export_properties:
+    name: Export Properties
     runs-on: ubuntu-latest
     outputs:
       changelog: ${{ steps.properties.outputs.changelog }}
@@ -53,8 +54,8 @@ jobs:
           echo "::set-output name=changelog::$CHANGELOG"
 
   # Prepare and publish the plugin to the Marketplace repository
-  PUBLISH:
-    name: Publish Plugin
+  publish:
+    name: Publish Plugin in Marketplace
     runs-on: ubuntu-latest
     steps:
 
@@ -81,9 +82,10 @@ jobs:
         run: |
           gh release upload ${{ github.event.release.tag_name }} ./build/distributions/*
 
-  CHANGELOG:
+  changelog:
+    name: Changelog
     needs:
-      - EXPORT_PROPERTIES
+      - export_properties
     runs-on: ubuntu-latest
     steps:
       # Check out current repository
