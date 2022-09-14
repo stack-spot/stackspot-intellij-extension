@@ -21,7 +21,8 @@ on:
     type: [SECURITY, RELEASE, RELEASED]
 
 jobs:
-  CHECK_CALLBACK:
+  check_callback:
+    name: Check Callback
     runs-on: ubuntu-latest
     steps:
       - name: Callback - ${{ github.event.client_payload.state }}
@@ -55,8 +56,11 @@ jobs:
                     "description": "Internal error",
                     "target_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
                   }'
-
-  PUSBLISH:
+    
+  publish:
+    name: Publish Plugin in Marketplace
+    needs:
+      - check_callback
     if: ${{ success() && github.event.event_type == 'RELEASED' }}
     uses: stack-spot/stackspot-intellij-extension/.github/workflows/publish-release.yml@main
     secrets:
