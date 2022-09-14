@@ -19,7 +19,8 @@ name: Deploy pre release
 on:
   push:
     branches:
-      - release-*
+      - 'release-*'
+      - '!changelog-update-*'
 
 jobs:
   DISPATCH_EVENT:

@@ -1,3 +1,5 @@
+import org.jetbrains.changelog.date
+
 fun properties(key: String) = project.findProperty(key).toString()
 
 plugins {
@@ -6,6 +8,9 @@ plugins {
     id("org.jetbrains.kotlin.jvm") version "1.7.10"
     id("org.jetbrains.intellij") version "1.8.0"
     id("org.sonarqube") version "3.4.0.2513"
+
+    // Gradle Changelog Plugin
+    id("org.jetbrains.changelog") version "1.3.1"
 }
 
 val projectVersion: String? = System.getProperty("project_version")
@@ -47,6 +52,20 @@ sonarqube {
     }
 }
 
+// Configure Gradle Changelog Plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
+changelog {
+    val regex =
+        Regex("""^v((0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)${'$'}""")
+    headerParserRegex.set(regex)
+    header.set(provider { "[v${version.get()}] - ${date()}" })
+
+    unreleasedTerm.set("Releases")
+    itemPrefix.set("*")
+    version.set(version)
+
+    groups.set(emptyList())
+}
+
 tasks {
     // Set the JVM compatibility versions
     withType<JavaCompile> {
@@ -71,14 +90,9 @@ tasks {
         untilBuild.set(properties("pluginUntilBuild"))
     }
 
-    signPlugin {
-        certificateChain.set(System.getenv("CERTIFICATE_CHAIN"))
-        privateKey.set(System.getenv("PRIVATE_KEY"))
-        password.set(System.getenv("PRIVATE_KEY_PASSWORD"))
-    }
-
     publishPlugin {
         token.set(System.getenv("PUBLISH_TOKEN"))
+        channels.set(listOf(System.getenv("CHANNEL")))
     }
 
     test {
