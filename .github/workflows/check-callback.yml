@@ -18,7 +18,7 @@ name: Check callback
 
 on:
   repository_dispatch:
-    type: [SECURITY, RELEASE, TAG]
+    type: [SECURITY, RELEASE, RELEASED]
 
 jobs:
   CHECK_CALLBACK:
@@ -55,3 +55,11 @@ jobs:
                     "description": "Internal error",
                     "target_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
                   }'
+    
+  PUSBLISH:
+    if: ${{ success() &&  github.event.event_type == 'RELEASED' }}
+    uses: stack-spot/stackspot-intellij-extension/.github/workflows/publish-release.yml@release-0.1.4
+    secrets:
+      accessToken: ${{ secrets.ACCESS_TOKEN }}
+      publishToken: ${{ secrets.PUBLISH_TOKEN }}
+      marketplaceChannel: ${{ secrets.MARKETPLACE_CHANNEL }}
