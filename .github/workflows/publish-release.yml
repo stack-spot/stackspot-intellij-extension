@@ -19,11 +19,11 @@ name: Publish Release
 on:
   workflow_call:
     secrets:
-      ACCESS_TOKEN:
+      accessToken:
         required: true
-      PUBLISH_TOKEN:
+      publishToken:
         required: true
-      CHANNEL:
+      marketplaceChannel:
         required: true
 
 concurrency:
@@ -67,8 +67,8 @@ jobs:
       # Publish the plugin to the Marketplace
       - name: Publish Plugin
         env:
-          PUBLISH_TOKEN: ${{ secrets.PUBLISH_TOKEN }}
-          CHANNEL: ${{ secrets.CHANNEL }}
+          PUBLISH_TOKEN: ${{ secrets.publishToken }}
+          MARKETPLACE_CHANNEL: ${{ secrets.marketplaceChannel }}
         run: |
           TAG=${{ github.event.release.tag_name }}
           TAG="${TAG//v/""}"
@@ -77,7 +77,7 @@ jobs:
       # Upload artifact as a release asset
       - name: Upload Release Asset
         env:
-          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.accessToken }}
         run: |
           gh release upload ${{ github.event.release.tag_name }} ./build/distributions/*
 
@@ -104,7 +104,7 @@ jobs:
       - name: Create Pull Request
         if: ${{ needs.EXPORT_PROPERTIES.outputs.changelog != '' }}
         env:
-          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.accessToken }}
         run: |
           VERSION="${{ github.event.release.tag_name }}"
           BRANCH="changelog-update-$VERSION"

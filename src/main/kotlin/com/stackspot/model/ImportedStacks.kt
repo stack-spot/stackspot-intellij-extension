@@ -18,11 +18,15 @@ package com.stackspot.model
 
 import com.stackspot.constants.Constants
 import com.stackspot.yaml.parseStackYaml
+import java.nio.file.Path
+import kotlin.io.path.exists
 
 class ImportedStacks {
 
+    fun hasStackFiles() = list().any { it.listStackfiles().isNotEmpty() }
+
     fun list(): List<Stack> {
-        val stacksDir = Constants.Paths.STACKS_DIR.toFile()
+        val stacksDir = getStacksDirPath().toFile()
         return stacksDir.walk().filter {
             it.isDirectory
         }.mapNotNull {
@@ -34,5 +38,16 @@ class ImportedStacks {
 
     fun getByName(name: String): Stack? {
         return list().firstOrNull { it.name == name }
+    }
+
+    private fun getStacksDirPath(): Path {
+        val stkHome = Constants.Paths.STK_HOME
+        val stacks = stkHome.resolve("stacks")
+        val stackDir: Path = if (stacks.exists()) {
+            stacks
+        } else {
+            stkHome.resolve("plugins")
+        }
+        return stackDir
     }
 }
