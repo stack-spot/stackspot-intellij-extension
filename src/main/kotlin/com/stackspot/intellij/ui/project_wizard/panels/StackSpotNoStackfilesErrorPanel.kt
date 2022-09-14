@@ -24,6 +24,10 @@ import com.stackspot.intellij.actions.IMPORT_STACK
 import com.stackspot.intellij.commands.BackgroundCommandRunner
 import com.stackspot.intellij.commands.listeners.NotifyProjectWizardImportedStack
 import com.stackspot.intellij.commands.stk.ImportStack
+import com.stackspot.intellij.commons.ErrorDialog.URL_IS_NOT_VALID_MESSAGE
+import com.stackspot.intellij.commons.ErrorDialog.URL_IS_NOT_VALID_TITLE
+import com.stackspot.intellij.commons.InputDialog.REPOSITORY_URL
+import com.stackspot.intellij.commons.isUrlValid
 import java.util.concurrent.Executors
 import javax.swing.JComponent
 
@@ -33,7 +37,7 @@ class StackSpotNoStackfilesErrorPanel(val parentPanel: StackSpotParentPanel) {
         return panel {
             row {
                 text(
-                    "In order to create a StackSpot project, you need to have stacks imported.",
+                    "In order to create a StackSpot project, you need to have stacks imported with <b>stackfiles.</b>",
                     maxLineLength = 80
                 )
             }
@@ -57,18 +61,23 @@ class StackSpotNoStackfilesErrorPanel(val parentPanel: StackSpotParentPanel) {
     }
 
     private fun askForStackUrl(): String? {
-        return Messages.showInputDialog("Enter Stack GIT URL To Import", IMPORT_STACK, Messages.getQuestionIcon())
+        return Messages.showInputDialog(REPOSITORY_URL, IMPORT_STACK, Messages.getQuestionIcon())
     }
 
     private fun runImportStack() {
-        val url = askForStackUrl()
+        val url = askForStackUrl() ?: return
+
+        if (!url.isUrlValid()) {
+            Messages.showErrorDialog(URL_IS_NOT_VALID_MESSAGE, URL_IS_NOT_VALID_TITLE)
+            return
+        }
+
         parentPanel.showImportingStack()
+
         val executor = Executors.newSingleThreadExecutor()
         executor.submit {
-            if (!url.isNullOrEmpty()) {
                 ImportStack(url, BackgroundCommandRunner(Constants.Paths.STK_HOME.toString()))
                     .run(NotifyProjectWizardImportedStack(parentPanel))
-            }
         }
         executor.shutdown()
     }

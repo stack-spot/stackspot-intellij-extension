@@ -66,7 +66,7 @@ Using StackSpot tool window after project opened:
 ## **Documentation**
 
 Check our official documentation page to use StackSpot IntelliJ plugin:
-[Documentation link](https://docs.stackspot.com/latest/)
+[Documentation link](https://docs.stackspot.com/latest/docs/extensions-for-ide/intellij/)
 
 ## **Contributing**
 
