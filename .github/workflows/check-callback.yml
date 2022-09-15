@@ -27,6 +27,7 @@ jobs:
     name: Check Callback
     runs-on: ubuntu-latest
     steps:
+
       - name: Check state - ${{ github.event.client_payload.state }}
         id: check_state
         if: |
@@ -34,6 +35,7 @@ jobs:
         run: |
           echo "Invalid state"
           exit 1
+
       - name: Callback - ${{ github.event.client_payload.state }}
         if: contains(fromJson('["pending", "success", "failure"]'), github.event.client_payload.state)
         run: |
@@ -49,6 +51,7 @@ jobs:
                     "description": "${{ github.event.client_payload.description }}",
                     "target_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
                   }'
+
       - name: Internal error ❌
         if: failure()
         run: |

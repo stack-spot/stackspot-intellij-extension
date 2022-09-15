@@ -42,7 +42,7 @@ jobs:
         id: properties
         run: |
           CHANGELOG="$(cat << 'EOM' | sed -e "/## What's Changed/d" -e 's/^[[:space:]]*$//g' -e '/./,$!d'
-          ${{ github.event.release.body }}
+          ${{ github.event.client_payload.release_body }}
           EOM
           )"
 
@@ -63,7 +63,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: ${{ github.event.release.tag_name }}
+          ref: ${{ github.event.client_payload.tag_name }}
 
       # Publish the plugin to the Marketplace
       - name: Publish Plugin
@@ -71,7 +71,7 @@ jobs:
           PUBLISH_TOKEN: ${{ secrets.publishToken }}
           MARKETPLACE_CHANNEL: ${{ secrets.marketplaceChannel }}
         run: |
-          TAG=${{ github.event.release.tag_name }}
+          TAG=${{ github.event.client_payload.tag_name }}
           TAG="${TAG//v/""}"
           ./gradlew publishPlugin -Dproject_version=$TAG
 
@@ -80,7 +80,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.accessToken }}
         run: |
-          gh release upload ${{ github.event.release.tag_name }} ./build/distributions/*
+          gh release upload ${{ github.event.client_payload.tag_name }} ./build/distributions/*
 
   changelog:
     name: Changelog
@@ -92,7 +92,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          ref: ${{ github.event.release.tag_name }}
+          ref: ${{ github.event.client_payload.tag_name }}
 
       # Update Unreleased section with the current release note
       - name: Patch Changelog
@@ -108,7 +108,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.accessToken }}
         run: |
-          VERSION="${{ github.event.release.tag_name }}"
+          VERSION="${{ github.event.client_payload.tag_name }}"
           BRANCH="changelog-update-$VERSION"
           
           git config user.email "action@github.com"
@@ -121,6 +121,6 @@ jobs:
           gh pr create \
             --title "Changelog update - \`$VERSION\`" \
             --body "current pull request contains patched \`changelog.md\` file for the \`$version\` version." \
-            --base "${{ github.event.release.target_commitish }}" \
+            --base "${{ github.event.client_payload.target_commitish }}" \
             --head $BRANCH \
             --label ignore-for-release
