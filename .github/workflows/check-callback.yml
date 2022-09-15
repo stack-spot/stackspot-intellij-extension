@@ -17,20 +17,29 @@
 name: Check callback
 
 on:
-  repository_dispatch:
-    type: [SECURITY, RELEASE, RELEASED]
+  workflow_call:
+    secrets:
+      accessToken:
+        required: true
 
 jobs:
   check_callback:
     name: Check Callback
     runs-on: ubuntu-latest
     steps:
+      - name: Check state - ${{ github.event.client_payload.state }}
+        id: check_state
+        if: |
+          !contains(fromJson('["pending", "success", "failure"]'), github.event.client_payload.state)
+        run: |
+          echo "Invalid state"
+          exit 1
       - name: Callback - ${{ github.event.client_payload.state }}
         if: contains(fromJson('["pending", "success", "failure"]'), github.event.client_payload.state)
         run: |
           curl --request POST \
           --url ${{ github.event.client_payload.statuses_href }} \
-          -u '${{ secrets.ACCESS_TOKEN }}' \
+          -u '${{ secrets.accessToken }}' \
           --header 'content-type: application/vnd.github+json' \
           -o result.json \
           --silent \
@@ -40,13 +49,12 @@ jobs:
                     "description": "${{ github.event.client_payload.description }}",
                     "target_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
                   }'
-
-      - name: Intenal error ❌
-        if: ${{ failure() && github.event.client_payload.state != 'failure'}}
+      - name: Internal error ❌
+        if: failure()
         run: |
           curl --request POST \
           --url ${{ github.event.client_payload.statuses_href }} \
-          -u '${{ secrets.ACCESS_TOKEN }}' \
+          -u '${{ secrets.accessToken }}' \
           --header 'content-type: application/vnd.github+json' \
           -o error.json \
           --silent \
@@ -56,14 +64,3 @@ jobs:
                     "description": "Internal error",
                     "target_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
                   }'
-    
-  publish:
-    name: Publish Plugin in Marketplace
-    needs:
-      - check_callback
-    if: ${{ success() && github.event.event_type == 'RELEASED' }}
-    uses: stack-spot/stackspot-intellij-extension/.github/workflows/publish-release.yml@main
-    secrets:
-      accessToken: ${{ secrets.ACCESS_TOKEN }}
-      publishToken: ${{ secrets.PUBLISH_TOKEN }}
-      marketplaceChannel: ${{ secrets.MARKETPLACE_CHANNEL }}
