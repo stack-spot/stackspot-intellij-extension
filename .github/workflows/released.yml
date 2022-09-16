@@ -18,7 +18,7 @@ name: Released
 
 on:
   repository_dispatch:
-    type: [RELEASED]
+    types: [RELEASED]
 
 jobs:
   check_callback:
@@ -29,6 +29,7 @@ jobs:
 
   publish:
     name: Publish Plugin
+    if: github.event.client_payload.state == 'success'
     needs:
       - check_callback
     uses: stack-spot/stackspot-intellij-extension/.github/workflows/publish-marketplace.yml@main

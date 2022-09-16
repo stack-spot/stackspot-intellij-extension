@@ -38,6 +38,9 @@ jobs:
                     "event_type": "RELEASED",
                     "client_payload": {
                       "ref": "${{ github.ref }}",
-                      "statuses_href": "'"$STATUSES_HREF"'"
+                      "statuses_href": "'"$STATUSES_HREF"'",
+                      "release_body": "${{ github.event.release.body }}",
+                      "tag_name": "${{ github.event.release.tag_name }}",
+                      "target_commitish": "${{ github.event.release.target_commitish }}"
                     }
                   }'
