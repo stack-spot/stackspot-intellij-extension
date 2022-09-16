@@ -54,7 +54,9 @@ jobs:
         env:
           CHANGELOG: ${{ steps.properties.outputs.changelog }}
         run: |
-          ./gradlew patchChangelog --release-note="$CHANGELOG"
+          TAG=${{ github.event.release.tag_name }}
+          TAG="${TAG//v/""}"
+          ./gradlew patchChangelog --release-note="$CHANGELOG" -Dproject_version=$TAG
 
       # Create pull request
       - name: Create Pull Request
