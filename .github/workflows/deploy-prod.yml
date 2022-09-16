@@ -21,11 +21,10 @@ on:
     types: [released]
 
 jobs:
-  export_properties:
-    name: Export Properties
+
+  changelog:
+    name: Changelog
     runs-on: ubuntu-latest
-    outputs:
-      changelog: ${{ steps.properties.outputs.changelog }}
     steps:
       # Set environment variables
       - name: Export Properties
@@ -43,12 +42,6 @@ jobs:
 
           echo "::set-output name=changelog::$CHANGELOG"
 
-  changelog:
-    name: Changelog
-    needs:
-      - export_properties
-    runs-on: ubuntu-latest
-    steps:
       # Check out current repository
       - name: Checkout
         uses: actions/checkout@v3
@@ -57,15 +50,15 @@ jobs:
 
       # Update Unreleased section with the current release note
       - name: Patch Changelog
-        if: ${{ needs.export_properties.outputs.changelog != '' }}
+        if: ${{ steps.properties.outputs.changelog != '' }}
         env:
-          CHANGELOG: ${{ needs.export_properties.outputs.changelog }}
+          CHANGELOG: ${{ steps.properties.outputs.changelog }}
         run: |
           ./gradlew patchChangelog --release-note="$CHANGELOG"
 
       # Create pull request
       - name: Create Pull Request
-        if: ${{ needs.export_properties.outputs.changelog != '' }}
+        if: ${{ steps.properties.outputs.changelog != '' }}
         env:
           GITHUB_TOKEN: ${{ secrets.accessToken }}
         run: |
