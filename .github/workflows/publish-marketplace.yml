@@ -31,27 +31,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  export_properties:
-    name: Export Properties
-    runs-on: ubuntu-latest
-    outputs:
-      changelog: ${{ steps.properties.outputs.changelog }}
-    steps:
-      # Set environment variables
-      - name: Export Properties
-        id: properties
-        run: |
-          CHANGELOG="$(cat << 'EOM' | sed -e "/## What's Changed/d" -e 's/^[[:space:]]*$//g' -e '/./,$!d'
-          ${{ github.event.client_payload.release_body }}
-          EOM
-          )"
 
-          CHANGELOG="${CHANGELOG//'%'/'%25'}"
-          CHANGELOG="${CHANGELOG//$'\n'/'%0A'}"
-          CHANGELOG="${CHANGELOG//$'\r'/'%0D'}"
-          CHANGELOG="${CHANGELOG//'**Full Changelog**'/'Full Changelog'}"
-
-          echo "::set-output name=changelog::$CHANGELOG"
 
   # Prepare and publish the plugin to the Marketplace repository
   publish:
@@ -81,46 +61,3 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.accessToken }}
         run: |
           gh release upload ${{ github.event.client_payload.tag_name }} ./build/distributions/*
-
-  changelog:
-    name: Changelog
-    needs:
-      - export_properties
-    runs-on: ubuntu-latest
-    steps:
-      # Check out current repository
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ github.event.client_payload.tag_name }}
-
-      # Update Unreleased section with the current release note
-      - name: Patch Changelog
-        if: ${{ needs.EXPORT_PROPERTIES.outputs.changelog != '' }}
-        env:
-          CHANGELOG: ${{ needs.EXPORT_PROPERTIES.outputs.changelog }}
-        run: |
-          ./gradlew patchChangelog --release-note="$CHANGELOG"
-
-      # Create pull request
-      - name: Create Pull Request
-        if: ${{ needs.EXPORT_PROPERTIES.outputs.changelog != '' }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.accessToken }}
-        run: |
-          VERSION="${{ github.event.client_payload.tag_name }}"
-          BRANCH="changelog-update-$VERSION"
-          
-          git config user.email "action@github.com"
-          git config user.name "GitHub Action"
-          
-          git checkout -b $BRANCH
-          git commit -asm "Changelog update - $VERSION"
-          git push --set-upstream origin $BRANCH
-          
-          gh pr create \
-            --title "Changelog update - \`$VERSION\`" \
-            --body "current pull request contains patched \`changelog.md\` file for the \`$version\` version." \
-            --base "${{ github.event.client_payload.target_commitish }}" \
-            --head $BRANCH \
-            --label ignore-for-release
