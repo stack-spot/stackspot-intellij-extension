@@ -35,11 +35,11 @@ changelog {
     val regex =
         Regex("""^v((0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)${'$'}""")
     headerParserRegex.set(regex)
-    header.set(provider { "[v${version.get()}] - ${date()}" })
+    header.set(provider { "[v${project.version}] - ${date()}" })
 
     unreleasedTerm.set("Releases")
     itemPrefix.set("*")
-    version.set(version)
+    version.set(project.version as String)
 
     groups.set(emptyList())
 }
@@ -57,6 +57,10 @@ tasks {
     patchPluginXml {
         sinceBuild.set("221")
         untilBuild.set("222.*")
+    }
+
+    buildSearchableOptions {
+        enabled = false
     }
 
     publishPlugin {
