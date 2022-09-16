@@ -62,7 +62,7 @@ jobs:
       - name: Create Pull Request
         if: ${{ steps.properties.outputs.changelog != '' }}
         env:
-          GITHUB_TOKEN: ${{ secrets.accessToken }}
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         run: |
           VERSION="${{ github.event.release.tag_name }}"
           BRANCH="changelog-update-$VERSION"
