@@ -4,10 +4,10 @@ fun properties(key: String) = project.findProperty(key).toString()
 
 plugins {
     id("java")
-//    id("jacoco")
+    id("jacoco")
     id("org.jetbrains.kotlin.jvm") version "1.7.10"
     id("org.jetbrains.intellij") version "1.8.0"
-//    id("org.sonarqube") version "3.4.0.2513"
+    id("org.sonarqube") version "3.4.0.2513"
 
     // Gradle Changelog Plugin
     id("org.jetbrains.changelog") version "1.3.1"
@@ -52,11 +52,11 @@ intellij {
     )
 }
 
-//sonarqube {
-//    properties {
-//        property("sonar.projectName", "ide-intellij-plugin")
-//    }
-//}
+sonarqube {
+    properties {
+        property("sonar.projectName", "ide-intellij-plugin")
+    }
+}
 
 // Configure Gradle Changelog Plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
 changelog {
@@ -107,16 +107,16 @@ tasks {
 
     test {
         useJUnitPlatform()
-//        testLogging {
-//            events("passed", "skipped", "failed")
-//        }
-//        finalizedBy(jacocoTestReport)
+        testLogging {
+            events("passed", "skipped", "failed")
+        }
+        finalizedBy(jacocoTestReport)
     }
 
-//    jacocoTestReport {
-//        dependsOn(test)
-//        reports {
-//            xml.required.set(true)
-//        }
-//    }
+    jacocoTestReport {
+        dependsOn(test)
+        reports {
+            xml.required.set(true)
+        }
+    }
 }
