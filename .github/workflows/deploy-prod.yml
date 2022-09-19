@@ -21,7 +21,67 @@ on:
     types: [released]
 
 jobs:
-  DISPATCH_EVENT:
+
+  changelog:
+    name: Changelog
+    runs-on: ubuntu-latest
+    steps:
+      # Set environment variables
+      - name: Export Properties
+        id: properties
+        run: |
+          CHANGELOG="$(cat << 'EOM' | sed -e "/## What's Changed/d" -e 's/^[[:space:]]*$//g' -e '/./,$!d'
+          ${{ github.event.release.body }}
+          EOM
+          )"
+
+          CHANGELOG="${CHANGELOG//'%'/'%25'}"
+          CHANGELOG="${CHANGELOG//$'\n'/'%0A'}"
+          CHANGELOG="${CHANGELOG//$'\r'/'%0D'}"
+          CHANGELOG="${CHANGELOG//'**Full Changelog**'/'Full Changelog'}"
+
+          echo "::set-output name=changelog::$CHANGELOG"
+
+      # Check out current repository
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
+      # Update Unreleased section with the current release note
+      - name: Patch Changelog
+        if: ${{ steps.properties.outputs.changelog != '' }}
+        env:
+          CHANGELOG: ${{ steps.properties.outputs.changelog }}
+        run: |
+          TAG=${{ github.event.release.tag_name }}
+          TAG="${TAG//v/""}"
+          ./gradlew patchChangelog --release-note="$CHANGELOG" -Dproject_version=$TAG
+
+      # Create pull request
+      - name: Create Pull Request
+        if: ${{ steps.properties.outputs.changelog != '' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        run: |
+          VERSION="${{ github.event.release.tag_name }}"
+          BRANCH="changelog-update-$VERSION"
+
+          git config user.email "action@github.com"
+          git config user.name "GitHub Action"
+
+          git checkout -b $BRANCH
+          git commit -asm "Changelog update - $VERSION"
+          git push --set-upstream origin $BRANCH
+
+          gh pr create \
+            --title "Changelog update - \`$VERSION\`" \
+            --body "current pull request contains patched \`changelog.md\` file for the \`$version\` version." \
+            --base "${{ github.event.release.target_commitish }}" \
+            --head $BRANCH \
+            --label ignore-for-release
+
+  dispatch_event:
     runs-on: ubuntu-latest
     steps:
       - name: Dispatch init event
@@ -38,6 +98,7 @@ jobs:
                     "event_type": "RELEASED",
                     "client_payload": {
                       "ref": "${{ github.ref }}",
-                      "statuses_href": "'"$STATUSES_HREF"'"
+                      "statuses_href": "'"$STATUSES_HREF"'",
+                      "tag_name": "${{ github.event.release.tag_name }}"
                     }
                   }'

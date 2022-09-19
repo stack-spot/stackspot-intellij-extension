@@ -57,11 +57,11 @@ changelog {
     val regex =
         Regex("""^v((0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?)${'$'}""")
     headerParserRegex.set(regex)
-    header.set(provider { "[v${version.get()}] - ${date()}" })
+    header.set(provider { "[v${project.version}] - ${date()}" })
 
     unreleasedTerm.set("Releases")
     itemPrefix.set("*")
-    version.set(version)
+    version.set(project.version as String)
 
     groups.set(emptyList())
 }
@@ -90,9 +90,13 @@ tasks {
         untilBuild.set(properties("pluginUntilBuild"))
     }
 
+    buildSearchableOptions {
+        enabled = false
+    }
+
     publishPlugin {
         token.set(System.getenv("PUBLISH_TOKEN"))
-        channels.set(listOf(System.getenv("CHANNEL")))
+        channels.set(listOf(System.getenv("MARKETPLACE_CHANNEL")))
     }
 
     test {
