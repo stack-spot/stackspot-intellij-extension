@@ -76,7 +76,7 @@ jobs:
 
           gh pr create \
             --title "Changelog update - \`$VERSION\`" \
-            --body "current pull request contains patched \`changelog.md\` file for the \`$version\` version." \
+            --body "current pull request contains patched \`changelog.md\` file for the \`$VERSION\` version." \
             --base "${{ github.event.release.target_commitish }}" \
             --head $BRANCH \
             --label ignore-for-release
