@@ -26,10 +26,10 @@ import java.util.*
 data class Stack(
     val name: String,
     val description: String,
-    val displayName: String?,
-    @JsonProperty("display-name") val displayNameKebab: String?,
-    val useCases: List<StackUseCase>?,
-    @JsonProperty("use-cases") val useCasesKebab: List<StackUseCase>?
+    val displayName: String? = null,
+    @JsonProperty("display-name") val displayNameKebab: String? = null,
+    val useCases: List<StackUseCase>? = null,
+    @JsonProperty("use-cases") val useCasesKebab: List<StackUseCase>? = null
 ) {
     lateinit var location: File
 
