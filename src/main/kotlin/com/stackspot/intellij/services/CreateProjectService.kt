@@ -53,9 +53,10 @@ class CreateProjectService {
         stackfile = null
     }
 
-    fun saveInfo(stack: Stack?, stackfile: Stackfile?) {
+    fun saveInfo(stack: Stack?, stackfile: Stackfile?): CreateProjectService {
         this.stack = stack
         this.stackfile = stackfile
+        return this
     }
 
     fun addGitConfig(username: String, email: String) {
