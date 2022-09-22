@@ -20,8 +20,8 @@ data class Stackfile(
     val type: String,
     val description: String,
     val template: String,
-    val inputs: Map<String, Any>?,
-    val plugins: List<StackfilePlugin>?
+    val inputs: Map<String, Any>? = null,
+    val plugins: List<StackfilePlugin>? = null
 ) {
     lateinit var name: String
 }
