@@ -1,3 +1,4 @@
+
 import org.jetbrains.changelog.date
 
 fun properties(key: String) = project.findProperty(key).toString()
