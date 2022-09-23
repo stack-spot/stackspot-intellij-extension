@@ -89,3 +89,4 @@ Please follow the [**Code of Conduct**](https://github.com/stack-spot/stackspot-
 ### **IntelliJ Plugin SDK documentation**
 
 - https://plugins.jetbrains.com/docs/intellij/welcome.html
+
