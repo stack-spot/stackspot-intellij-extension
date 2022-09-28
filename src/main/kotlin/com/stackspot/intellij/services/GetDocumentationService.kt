@@ -29,7 +29,7 @@ import java.util.logging.Logger
 @Service
 class GetDocumentationService {
 
-    companion object {
+    private companion object {
         val LOGGER: Logger = Logger.getLogger(GetDocumentationService::class.java.name)
         val REMOTE_URL_SSH_REGEX = Regex("(?i)(git@).*?.git")
     }
@@ -71,13 +71,14 @@ class GetDocumentationService {
     }
 
     private fun getRemoteUrl(stack: Stack): String {
-        val gitRemoteCmd = GitConfig(stack.location.toPath().toString(), arrayOf("--get", "remote.origin.url"))
+        val gitRemoteCmd = GitConfig(stack.location.toPath().toString())
+        gitRemoteCmd.flags = arrayOf("--get", "remote.origin.url")
         gitRemoteCmd.run()
         return (gitRemoteCmd.runner as BackgroundCommandRunner).stdout
     }
 
     private fun getCurrentBranchName(stack: Stack): String {
-        val gitBranchCmd = GitBranch(stack, arrayOf("--show-current"))
+        val gitBranchCmd = GitBranch(stack.location.toPath().toString(), arrayOf("--show-current"))
         gitBranchCmd.run()
         return (gitBranchCmd.runner as BackgroundCommandRunner).stdout
     }

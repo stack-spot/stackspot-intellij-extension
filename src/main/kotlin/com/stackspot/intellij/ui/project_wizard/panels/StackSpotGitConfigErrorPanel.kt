@@ -26,8 +26,8 @@ import javax.swing.JComponent
 
 class StackSpotGitConfigErrorPanel(private val parentPanel: StackSpotParentPanel) {
 
-    lateinit var username: Cell<JBTextField>
-    lateinit var email: Cell<JBTextField>
+    private lateinit var username: Cell<JBTextField>
+    private lateinit var email: Cell<JBTextField>
 
     fun getComponent(): JComponent {
         return panel {

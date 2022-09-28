@@ -87,9 +87,7 @@ data class Stack(
             it.isDirectory
         }.filter {
             val template = it.parseTemplateYaml(this)
-            template != null && (template.types.contains(TemplateType.APP.pluginType) || template.types.contains(
-                TemplateType.APP.pluginType
-            ))
+            template != null && (template.types.contains(TemplateType.APP.pluginType))
         }.mapNotNull {
             it.parsePluginYaml(this)
         }.toList()

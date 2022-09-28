@@ -1,3 +1,4 @@
+import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.changelog.date
 
 fun properties(key: String) = project.findProperty(key).toString()
@@ -27,8 +28,11 @@ repositories {
 }
 
 dependencies {
-    testImplementation(platform("org.junit:junit-bom:5.9.0"))
+    testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("io.mockk:mockk:1.13.1")
+    testImplementation("io.kotest:kotest-assertions-core:5.4.2")
+    testImplementation("org.awaitility:awaitility-kotlin:4.2.0")
 }
 
 kotlin {
@@ -107,7 +111,7 @@ tasks {
     test {
         useJUnitPlatform()
         testLogging {
-            events("passed", "skipped", "failed")
+            events(TestLogEvent.PASSED, TestLogEvent.SKIPPED, TestLogEvent.FAILED)
         }
         finalizedBy(jacocoTestReport)
     }
@@ -117,5 +121,18 @@ tasks {
         reports {
             xml.required.set(true)
         }
+        classDirectories.setFrom(
+            files(classDirectories.files.map {
+                fileTree(it) {
+                    exclude(
+                        "**/com/stackspot/constants/**",
+                        "**/com/stackspot/exceptions/**",
+                        "**/com/stackspot/intellij/actions/**",
+                        "**/com/stackspot/intellij/messaging/**",
+                        "**/com/stackspot/intellij/ui/**"
+                    )
+                }
+            })
+        )
     }
 }

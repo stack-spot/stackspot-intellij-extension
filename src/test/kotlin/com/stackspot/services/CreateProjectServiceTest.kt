@@ -14,71 +14,163 @@
  * limitations under the License.
  */
 
-package com.stackspot.services
+package com.stackspot.intellij.services
 
-import com.stackspot.intellij.services.CreateProjectService
+import com.stackspot.intellij.commands.git.GitConfig
+import com.stackspot.intellij.services.enums.ProjectWizardState
+import com.stackspot.model.ImportedStacks
 import com.stackspot.model.Stack
 import com.stackspot.model.Stackfile
+import io.kotest.assertions.asClue
+import io.kotest.matchers.shouldBe
+import io.mockk.*
+import org.awaitility.kotlin.await
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import java.util.concurrent.TimeUnit
 import java.util.stream.Stream
 
-class CreateProjectServiceTest {
+internal class CreateProjectServiceTest {
 
-    @ParameterizedTest
-    @MethodSource("saveInfoArgs")
-    fun `should saveInfo when args are nullable and when they don't`(stack: Stack?, stackfile: Stackfile?) {
-        val service = CreateProjectService().saveInfo(stack, stackfile)
-        Assertions.assertEquals(stack, service.stack)
-        Assertions.assertEquals(stackfile, service.stackfile)
+    private val importedStacks: ImportedStacks = mockk()
+
+    @BeforeEach
+    fun init() {
+        clearAllMocks()
     }
 
-    @ParameterizedTest
-    @MethodSource("stackfileIsSelectedArgs")
-    fun `should check if stackfile is selected and when it don't`(
-        stack: Stack?,
-        stackfile: Stackfile?,
-        expected: Boolean
-    ) {
-        val service = CreateProjectService().saveInfo(stack, stackfile)
-        Assertions.assertEquals(service.isStackfileSelected(), expected)
-    }
+    @Nested
+    inner class FailureCases {
+        @Test
+        fun `service state should be STACKFILES_EMPTY`() {
+            every { importedStacks.hasStackFiles() } returns false
+            val service = CreateProjectService(importedStacks)
+            service.state shouldBe ProjectWizardState.STACKFILES_EMPTY
+            verify { importedStacks.hasStackFiles() }
+            confirmVerified(importedStacks)
+        }
 
-    private companion object {
-        @JvmStatic
-        fun stackfileIsSelectedArgs(): Stream<Arguments> =
+        @Test
+        fun `service state should be NOT_INSTALLED`() {
+            val service = CreateProjectService(isInstalled = false)
+            service.state shouldBe ProjectWizardState.NOT_INSTALLED
+        }
+
+        @ParameterizedTest
+        @MethodSource("stackfileIsSelectNullArgs")
+        fun `should check if stackfile isn't selected`(
+            stack: Stack?,
+            stackfile: Stackfile?,
+            expected: Boolean
+        ) {
+            val service = CreateProjectService().saveInfo(stack, stackfile)
+            Assertions.assertEquals(service.isStackfileSelected(), expected)
+        }
+
+        private fun stackfileIsSelectNullArgs(): Stream<Arguments> =
             Stream.of(
-                Arguments.of(
-                    null, null, false
-                ),
-                Arguments.of(
-                    createStack(),
-                    createStackfile(),
-                    true
-                )
+                Arguments.of(null, null, false),
+                Arguments.of(createStack(), null, false),
+                Arguments.of(null, createStackfile(), false)
+            )
+    }
+
+    @Nested
+    inner class SuccessCases {
+        @Test
+        fun `should clear service attributes`() {
+            val service = CreateProjectService().saveInfo(createStack(), createStackfile())
+            service.clearInfo()
+
+            service.asClue {
+                it.stack shouldBe null
+                it.stackfile shouldBe null
+            }
+        }
+
+        @Test
+        fun `service state should be OK`() {
+            every { importedStacks.hasStackFiles() } returns true
+            val service = CreateProjectService(importedStacks)
+            service.state shouldBe ProjectWizardState.OK
+            verify { importedStacks.hasStackFiles() }
+            confirmVerified(importedStacks)
+        }
+
+        @Test
+        fun `should add git config`() {
+            val gitConfigCmd: GitConfig = mockk(relaxUnitFun = true)
+            every { gitConfigCmd.run() } just runs
+            val service = CreateProjectService(gitConfigCmd = gitConfigCmd)
+            service.addGitConfig("aaa", "b@b.com")
+            await.atMost(500, TimeUnit.MILLISECONDS)
+                .untilAsserted {
+                    verify(exactly = 2) { gitConfigCmd.run() }
+                }
+        }
+
+        @ParameterizedTest
+        @MethodSource("saveInfoArgs")
+        fun `should saveInfo when args aren't null`(stack: Stack?, stackfile: Stackfile?) {
+            val service = CreateProjectService().saveInfo(stack, stackfile)
+            service.asClue {
+                it.stack shouldBe stack
+                it.stackfile shouldBe stackfile
+            }
+        }
+
+        @ParameterizedTest
+        @MethodSource("saveInfoNullArgs")
+        fun `should saveInfo when args are null`(stack: Stack?, stackfile: Stackfile?) {
+            val service = CreateProjectService().saveInfo(stack, stackfile)
+            service.asClue {
+                it.stack shouldBe stack
+                it.stackfile shouldBe stackfile
+            }
+        }
+
+        @ParameterizedTest
+        @MethodSource("stackfileIsSelectedArgs")
+        fun `should check if stackfile is selected`(
+            stack: Stack?,
+            stackfile: Stackfile?,
+            expected: Boolean
+        ) {
+            val service = CreateProjectService().saveInfo(stack, stackfile)
+            Assertions.assertEquals(service.isStackfileSelected(), expected)
+        }
+
+        private fun stackfileIsSelectedArgs(): Stream<Arguments> =
+            Stream.of(
+                Arguments.of(createStack(), createStackfile(), true)
             )
 
-        @JvmStatic
-        fun saveInfoArgs(): Stream<Arguments> =
+        private fun saveInfoArgs(): Stream<Arguments> =
             Stream.of(
                 Arguments.of(
                     null, null
-                ),
-                Arguments.of(
-                    createStack(),
-                    createStackfile()
                 )
             )
 
-        private fun createStack(name: String = "stack-for-test", description: String = "stack test description") =
-            Stack(name, description)
-
-        private fun createStackfile(
-            type: String = "app",
-            description: String = "stackfile test description",
-            template: String = "test-tempalte"
-        ) = Stackfile(type, description, template)
+        private fun saveInfoNullArgs(): Stream<Arguments> =
+            Stream.of(
+                Arguments.of(
+                    null, null
+                )
+            )
     }
+
+    private fun createStack(name: String = "stack-for-test", description: String = "stack test description") =
+        Stack(name, description)
+
+    private fun createStackfile(
+        type: String = "app",
+        description: String = "stackfile test description",
+        template: String = "test-template"
+    ) = Stackfile(type, description, template)
 }
