@@ -19,7 +19,7 @@ package com.stackspot.intellij.commands.git
 import com.stackspot.intellij.commands.BackgroundCommandRunner
 import com.stackspot.intellij.commands.BaseCommand
 
-class GitBranch(workingDir: String, private val flags: Array<String>) :
+class GitBranch(var workingDir: String, private val flags: Array<String>) :
     BaseCommand(BackgroundCommandRunner(workingDir)) {
 
     override fun commandLine(): List<String> {

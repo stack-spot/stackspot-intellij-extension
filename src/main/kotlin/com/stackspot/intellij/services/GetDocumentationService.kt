@@ -18,6 +18,7 @@ package com.stackspot.intellij.services
 
 import com.intellij.openapi.components.Service
 import com.intellij.util.containers.isNullOrEmpty
+import com.stackspot.constants.Constants
 import com.stackspot.intellij.commands.BackgroundCommandRunner
 import com.stackspot.intellij.commands.git.GitBranch
 import com.stackspot.intellij.commands.git.GitConfig
@@ -27,7 +28,18 @@ import java.util.logging.Level
 import java.util.logging.Logger
 
 @Service
-class GetDocumentationService {
+class GetDocumentationService() {
+
+    private var gitConfigCmd = GitConfig(Constants.Paths.STK_HOME.toString())
+    private var gitBranchCmd = GitBranch(Constants.Paths.STK_HOME.toString(), arrayOf("--show-current"))
+
+    constructor(
+        gitConfigCmd: GitConfig = GitConfig(Constants.Paths.STK_HOME.toString()),
+        gitBranchCmd: GitBranch = GitBranch(Constants.Paths.STK_HOME.toString(), arrayOf("--show-current"))
+    ) : this() {
+        this.gitConfigCmd = gitConfigCmd
+        this.gitBranchCmd = gitBranchCmd
+    }
 
     private companion object {
         val LOGGER: Logger = Logger.getLogger(GetDocumentationService::class.java.name)
@@ -71,14 +83,14 @@ class GetDocumentationService {
     }
 
     private fun getRemoteUrl(stack: Stack): String {
-        val gitRemoteCmd = GitConfig(stack.location.toPath().toString())
-        gitRemoteCmd.flags = arrayOf("--get", "remote.origin.url")
-        gitRemoteCmd.run()
-        return (gitRemoteCmd.runner as BackgroundCommandRunner).stdout
+        gitConfigCmd.workingDirectory = stack.location.toPath().toString()
+        gitConfigCmd.flags = arrayOf("--get", "remote.origin.url")
+        gitConfigCmd.run()
+        return (gitConfigCmd.runner as BackgroundCommandRunner).stdout
     }
 
     private fun getCurrentBranchName(stack: Stack): String {
-        val gitBranchCmd = GitBranch(stack.location.toPath().toString(), arrayOf("--show-current"))
+        gitBranchCmd.workingDir = stack.location.toPath().toString()
         gitBranchCmd.run()
         return (gitBranchCmd.runner as BackgroundCommandRunner).stdout
     }

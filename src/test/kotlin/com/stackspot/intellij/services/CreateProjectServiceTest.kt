@@ -16,6 +16,7 @@
 
 package com.stackspot.intellij.services
 
+import com.stackspot.intellij.commands.BackgroundCommandRunner
 import com.stackspot.intellij.commands.git.GitConfig
 import com.stackspot.intellij.services.enums.ProjectWizardState
 import com.stackspot.model.ImportedStacks
@@ -38,6 +39,7 @@ import java.util.stream.Stream
 internal class CreateProjectServiceTest {
 
     private val importedStacks: ImportedStacks = mockk()
+    private val gitConfigCmd: GitConfig = mockk(relaxUnitFun = true)
 
     @BeforeEach
     fun init() {
@@ -59,6 +61,17 @@ internal class CreateProjectServiceTest {
         fun `service state should be NOT_INSTALLED`() {
             val service = CreateProjectService(isInstalled = false)
             service.state shouldBe ProjectWizardState.NOT_INSTALLED
+        }
+
+        @Test
+        fun `service state should be GIT_CONFIG_NOT_OK`() {
+            every { importedStacks.hasStackFiles() } returns true
+            every { (gitConfigCmd.runner as BackgroundCommandRunner).stdout } returns ""
+            val service = CreateProjectService(importedStacks, gitConfigCmd = gitConfigCmd)
+            service.state shouldBe ProjectWizardState.GIT_CONFIG_NOT_OK
+            verify { importedStacks.hasStackFiles() }
+            verify { gitConfigCmd.run() }
+            confirmVerified(importedStacks)
         }
 
         @ParameterizedTest
@@ -104,7 +117,6 @@ internal class CreateProjectServiceTest {
 
         @Test
         fun `should add git config`() {
-            val gitConfigCmd: GitConfig = mockk(relaxUnitFun = true)
             every { gitConfigCmd.run() } just runs
             val service = CreateProjectService(gitConfigCmd = gitConfigCmd)
             service.addGitConfig("aaa", "b@b.com")

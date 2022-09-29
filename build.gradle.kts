@@ -56,8 +56,22 @@ intellij {
 }
 
 sonarqube {
+    val exclusions = listOf(
+        "**/com/stackspot/constants/**",
+        "**/com/stackspot/exceptions/*",
+        "**/com/stackspot/intellij/actions/*",
+        "**/com/stackspot/intellij/commands/git/*",
+        "**/com/stackspot/intellij/commands/listeners/*",
+        "**/com/stackspot/intellij/commands/stk/*",
+        "**/com/stackspot/intellij/listeners/*",
+        "**/com/stackspot/intellij/messaging/*",
+        "**/com/stackspot/intellij/ui/*",
+        "**/com/stackspot/model/*",
+    )
+
     properties {
         property("sonar.projectName", "ide-intellij-plugin")
+        property("sonar.coverage.exclusions", exclusions)
     }
 }
 
@@ -125,11 +139,16 @@ tasks {
             files(classDirectories.files.map {
                 fileTree(it) {
                     exclude(
-                        "**/com/stackspot/constants/**",
-                        "**/com/stackspot/exceptions/**",
-                        "**/com/stackspot/intellij/actions/**",
-                        "**/com/stackspot/intellij/messaging/**",
-                        "**/com/stackspot/intellij/ui/**"
+                        "com/stackspot/constants/*",
+                        "com/stackspot/exceptions/*",
+                        "com/stackspot/intellij/actions/*",
+                        "com/stackspot/intellij/commands/git/*",
+                        "com/stackspot/intellij/commands/listeners/*",
+                        "com/stackspot/intellij/commands/stk/*",
+                        "com/stackspot/intellij/listeners/*",
+                        "com/stackspot/intellij/messaging/*",
+                        "com/stackspot/intellij/ui/*",
+                        "com/stackspot/model/*",
                     )
                 }
             })

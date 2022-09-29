@@ -18,7 +18,6 @@ package com.stackspot.constants
 
 import java.nio.file.Path
 import kotlin.io.path.Path
-import kotlin.io.path.exists
 
 object Constants {
     const val MODULE_TYPE = "STACK_SPOT_TYPE"

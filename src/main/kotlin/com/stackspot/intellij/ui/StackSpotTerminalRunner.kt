@@ -24,7 +24,6 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowManager
-import com.intellij.ui.content.Content
 import com.intellij.ui.content.ContentManager
 import com.jediterm.terminal.model.TerminalModelListener
 import com.stackspot.constants.Constants
@@ -64,10 +63,6 @@ class StackSpotTerminalCommandMonitoringTask(
             listener.notifyEnded()
         }
         widget.terminalTextBuffer.removeModelListener(this)
-    }
-
-    private fun hasRunningCommand(): Boolean {
-        return widget.ttyConnector != null && widget.hasRunningCommands()
     }
 }
 
