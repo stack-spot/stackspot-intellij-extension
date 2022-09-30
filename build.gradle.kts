@@ -58,15 +58,19 @@ intellij {
 sonarqube {
     val exclusions = listOf(
         "**/com/stackspot/constants/**",
-        "**/com/stackspot/exceptions/*",
-        "**/com/stackspot/intellij/actions/*",
-        "**/com/stackspot/intellij/commands/git/*",
-        "**/com/stackspot/intellij/commands/listeners/*",
-        "**/com/stackspot/intellij/commands/stk/*",
-        "**/com/stackspot/intellij/listeners/*",
-        "**/com/stackspot/intellij/messaging/*",
-        "**/com/stackspot/intellij/ui/*",
-        "**/com/stackspot/model/*",
+        "**/com/stackspot/exceptions/**",
+        "**/com/stackspot/intellij/actions/**",
+        "**/com/stackspot/intellij/commands/git/**",
+        "**/com/stackspot/intellij/commands/listeners/**",
+        "**/com/stackspot/intellij/commands/stk/**",
+        "**/com/stackspot/intellij/listeners/**",
+        "**/com/stackspot/intellij/messaging/**",
+        "**/com/stackspot/intellij/ui/**",
+        "**/com/stackspot/model/Plugin.kt",
+        "**/com/stackspot/model/Stackfile.kt",
+        "**/com/stackspot/model/StackfilePlugin.kt",
+        "**/com/stackspot/model/StackfileUseCase.kt",
+        "**/com/stackspot/model/TemplateType.kt",
     )
 
     properties {
@@ -148,7 +152,11 @@ tasks {
                         "com/stackspot/intellij/listeners/*",
                         "com/stackspot/intellij/messaging/*",
                         "com/stackspot/intellij/ui/*",
-                        "com/stackspot/model/*",
+                        "com/stackspot/model/Plugin.kt",
+                        "com/stackspot/model/Stackfile.kt",
+                        "com/stackspot/model/StackfilePlugin.kt",
+                        "com/stackspot/model/StackfileUseCase.kt",
+                        "com/stackspot/model/TemplateType.kt",
                     )
                 }
             })

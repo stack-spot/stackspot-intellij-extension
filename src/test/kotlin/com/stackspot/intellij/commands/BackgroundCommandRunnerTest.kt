@@ -4,10 +4,7 @@ import com.intellij.execution.process.ProcessOutput
 import com.intellij.execution.util.ExecUtil
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import io.mockk.confirmVerified
-import io.mockk.every
-import io.mockk.mockkStatic
-import io.mockk.verify
+import io.mockk.*
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -16,11 +13,34 @@ import java.util.stream.Stream
 internal class BackgroundCommandRunnerTest {
 
     @ParameterizedTest
-    @MethodSource("args")
-    fun bla(commandLine: List<String>, listener: CommandRunner.CommandEndedListener?) {
+    @MethodSource("runCommandArgs")
+    fun `should run command`(commandLine: List<String>) {
         //Arrange
         mockkStatic(ExecUtil::class)
         every { ExecUtil.execAndGetOutput(any()) } returns ProcessOutput("OK", "", 0, false, false)
+
+        //Act
+        val backgroundCommandRunner = BackgroundCommandRunner("")
+        backgroundCommandRunner.run(commandLine)
+
+        //Assert
+        backgroundCommandRunner.stdout shouldNotBe ""
+        backgroundCommandRunner.stderr shouldBe ""
+        backgroundCommandRunner.exitCode shouldBe 0
+        backgroundCommandRunner.timeout shouldBe false
+        backgroundCommandRunner.cancelled shouldBe false
+
+        verify { ExecUtil.execAndGetOutput(any()) }
+    }
+
+    @ParameterizedTest
+    @MethodSource("runCommandArgs")
+    fun `should run command with listener`(commandLine: List<String>) {
+        //Arrange
+        val listener: CommandRunner.CommandEndedListener = mockk()
+        mockkStatic(ExecUtil::class)
+        every { ExecUtil.execAndGetOutput(any()) } returns ProcessOutput("OK", "", 0, false, false)
+        every { listener.notifyEnded() } just Runs
 
         //Act
         val backgroundCommandRunner = BackgroundCommandRunner("")
@@ -34,11 +54,35 @@ internal class BackgroundCommandRunnerTest {
         backgroundCommandRunner.cancelled shouldBe false
 
         verify { ExecUtil.execAndGetOutput(any()) }
+        verify { listener.notifyEnded() }
+
+        confirmVerified(listener)
     }
 
-    private fun args(): Stream<Arguments> =
+    @ParameterizedTest
+    @MethodSource("runCommandArgs")
+    fun `should run command error`(commandLine: List<String>) {
+        //Arrange
+        mockkStatic(ExecUtil::class)
+        every { ExecUtil.execAndGetOutput(any()) } returns ProcessOutput("", "ERROR", 1, false, false)
+
+        //Act
+        val backgroundCommandRunner = BackgroundCommandRunner("")
+        backgroundCommandRunner.run(commandLine)
+
+        //Assert
+        backgroundCommandRunner.stdout shouldBe ""
+        backgroundCommandRunner.stderr shouldNotBe ""
+        backgroundCommandRunner.exitCode shouldBe 1
+        backgroundCommandRunner.timeout shouldBe false
+        backgroundCommandRunner.cancelled shouldBe false
+
+        verify { ExecUtil.execAndGetOutput(any()) }
+    }
+
+    private fun runCommandArgs(): Stream<Arguments> =
         Stream.of(
-            Arguments.of(listOf("git", "config", "--get", "user.name"), null)
+            Arguments.of(listOf("git", "config", "--get", "user.name"))
         )
 
 }
