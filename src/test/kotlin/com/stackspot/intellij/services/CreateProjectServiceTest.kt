@@ -26,7 +26,9 @@ import io.kotest.assertions.asClue
 import io.kotest.matchers.shouldBe
 import io.mockk.*
 import org.awaitility.kotlin.await
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -79,7 +81,7 @@ internal class CreateProjectServiceTest {
             expected: Boolean
         ) {
             val service = CreateProjectService().saveInfo(stack, stackfile)
-            Assertions.assertEquals(service.isStackfileSelected(), expected)
+            service.isStackfileSelected() shouldBe expected
         }
 
         private fun stackfileIsSelectNullArgs(): Stream<Arguments> =
@@ -151,7 +153,7 @@ internal class CreateProjectServiceTest {
             expected: Boolean
         ) {
             val service = CreateProjectService().saveInfo(stack, stackfile)
-            Assertions.assertEquals(service.isStackfileSelected(), expected)
+            service.isStackfileSelected() shouldBe expected
         }
 
         private fun stackfileIsSelectedArgs(): Stream<Arguments> =
