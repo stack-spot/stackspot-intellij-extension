@@ -1,3 +1,4 @@
+import org.gradle.api.tasks.testing.logging.TestLogEvent
 import org.jetbrains.changelog.date
 
 fun properties(key: String) = project.findProperty(key).toString()
@@ -27,8 +28,11 @@ repositories {
 }
 
 dependencies {
-    testImplementation(platform("org.junit:junit-bom:5.9.0"))
+    testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("io.mockk:mockk:1.13.1")
+    testImplementation("io.kotest:kotest-assertions-core:5.4.2")
+    testImplementation("org.awaitility:awaitility-kotlin:4.2.0")
 }
 
 kotlin {
@@ -52,8 +56,26 @@ intellij {
 }
 
 sonarqube {
+    val exclusions = listOf(
+        "**/com/stackspot/constants/**",
+        "**/com/stackspot/exceptions/**",
+        "**/com/stackspot/intellij/actions/**",
+        "**/com/stackspot/intellij/commands/git/**",
+        "**/com/stackspot/intellij/commands/listeners/**",
+        "**/com/stackspot/intellij/commands/stk/**",
+        "**/com/stackspot/intellij/listeners/**",
+        "**/com/stackspot/intellij/messaging/**",
+        "**/com/stackspot/intellij/ui/**",
+        "**/com/stackspot/model/Plugin.kt",
+        "**/com/stackspot/model/Stackfile.kt",
+        "**/com/stackspot/model/StackfilePlugin.kt",
+        "**/com/stackspot/model/StackfileUseCase.kt",
+        "**/com/stackspot/model/TemplateType.kt",
+    )
+
     properties {
         property("sonar.projectName", "ide-intellij-plugin")
+        property("sonar.coverage.exclusions", exclusions)
     }
 }
 
@@ -107,7 +129,7 @@ tasks {
     test {
         useJUnitPlatform()
         testLogging {
-            events("passed", "skipped", "failed")
+            events(TestLogEvent.PASSED, TestLogEvent.SKIPPED, TestLogEvent.FAILED)
         }
         finalizedBy(jacocoTestReport)
     }
@@ -117,5 +139,27 @@ tasks {
         reports {
             xml.required.set(true)
         }
+        classDirectories.setFrom(
+            files(classDirectories.files.map {
+                fileTree(it) {
+                    exclude(
+                        "com/stackspot/constants/*",
+                        "com/stackspot/exceptions/*",
+                        "com/stackspot/intellij/actions/*",
+                        "com/stackspot/intellij/commands/git/*",
+                        "com/stackspot/intellij/commands/listeners/*",
+                        "com/stackspot/intellij/commands/stk/*",
+                        "com/stackspot/intellij/listeners/*",
+                        "com/stackspot/intellij/messaging/*",
+                        "com/stackspot/intellij/ui/*",
+                        "com/stackspot/model/Plugin.kt",
+                        "com/stackspot/model/Stackfile.kt",
+                        "com/stackspot/model/StackfilePlugin.kt",
+                        "com/stackspot/model/StackfileUseCase.kt",
+                        "com/stackspot/model/TemplateType.kt",
+                    )
+                }
+            })
+        )
     }
 }

@@ -29,15 +29,15 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 @Service
-class CreateProjectService {
+class CreateProjectService() {
 
     var stack: Stack? = null
     var stackfile: Stackfile? = null
     val state: ProjectWizardState
         get() {
-            return if (!Constants.Paths.STK_BIN.exists()) {
+            return if (!isInstalled) {
                 ProjectWizardState.NOT_INSTALLED
-            } else if (!ImportedStacks().hasStackFiles()) {
+            } else if (!importedStacks.hasStackFiles()) {
                 ProjectWizardState.STACKFILES_EMPTY
             } else if (!isGitConfigOk()) {
                 ProjectWizardState.GIT_CONFIG_NOT_OK
@@ -45,6 +45,19 @@ class CreateProjectService {
                 ProjectWizardState.OK
             }
         }
+    private var isInstalled = Constants.Paths.STK_BIN.exists()
+    private var importedStacks = ImportedStacks()
+    private var gitConfigCmd = GitConfig(Constants.Paths.STK_HOME.toString())
+
+    constructor(
+        importedStacks: ImportedStacks = ImportedStacks(),
+        isInstalled: Boolean = Constants.Paths.STK_BIN.exists(),
+        gitConfigCmd: GitConfig = GitConfig(Constants.Paths.STK_HOME.toString())
+    ) : this() {
+        this.importedStacks = importedStacks
+        this.isInstalled = isInstalled
+        this.gitConfigCmd = gitConfigCmd
+    }
 
     fun isStackfileSelected(): Boolean = stack != null && stackfile != null
 
@@ -62,9 +75,11 @@ class CreateProjectService {
     fun addGitConfig(username: String, email: String) {
         val executor = Executors.newSingleThreadExecutor()
         executor.submit {
-            val workingDir = Constants.Paths.STK_HOME.toString()
-            GitConfig(workingDir, arrayOf("--global", "user.name", "\"$username\"")).run()
-            GitConfig(workingDir, arrayOf("--global", "user.email", "\"$email\"")).run()
+            gitConfigCmd.flags = arrayOf("--global", "user.name", "\"$username\"")
+            gitConfigCmd.run()
+
+            gitConfigCmd.flags = arrayOf("--global", "user.email", "\"$email\"")
+            gitConfigCmd.run()
         }
         executor.shutdown()
     }
@@ -87,14 +102,14 @@ class CreateProjectService {
     }
 
     private fun getEmailGitConfig(): String {
-        val gitConfigUserEmail = GitConfig(Constants.Paths.STK_HOME.toString(), arrayOf("--get", "user.email"))
-        gitConfigUserEmail.run()
-        return (gitConfigUserEmail.runner as BackgroundCommandRunner).stdout
+        gitConfigCmd.flags = arrayOf("--get", "user.email")
+        gitConfigCmd.run()
+        return (gitConfigCmd.runner as BackgroundCommandRunner).stdout
     }
 
     private fun getUsernameGitConfig(): String {
-        val gitConfigUserName = GitConfig(Constants.Paths.STK_HOME.toString(), arrayOf("--get", "user.name"))
-        gitConfigUserName.run()
-        return (gitConfigUserName.runner as BackgroundCommandRunner).stdout
+        gitConfigCmd.flags = arrayOf("--get", "user.name")
+        gitConfigCmd.run()
+        return (gitConfigCmd.runner as BackgroundCommandRunner).stdout
     }
 }

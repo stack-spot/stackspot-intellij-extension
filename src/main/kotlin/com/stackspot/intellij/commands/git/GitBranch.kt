@@ -18,10 +18,9 @@ package com.stackspot.intellij.commands.git
 
 import com.stackspot.intellij.commands.BackgroundCommandRunner
 import com.stackspot.intellij.commands.BaseCommand
-import com.stackspot.model.Stack
 
-class GitBranch(stack: Stack, private val flags: Array<String>) :
-    BaseCommand(BackgroundCommandRunner(stack.location.toPath().toString())) {
+class GitBranch(var workingDir: String, private val flags: Array<String>) :
+    BaseCommand(BackgroundCommandRunner(workingDir)) {
 
     override fun commandLine(): List<String> {
         return listOf("git", "branch", *flags)
