@@ -4,7 +4,7 @@ on:
   pull_request:
 
 jobs:
-  sonar-check:
+  sonar_check:
     name: SonarQube check
     runs-on: ubuntu-latest
     steps:
