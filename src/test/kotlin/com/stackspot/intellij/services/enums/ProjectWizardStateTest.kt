@@ -25,12 +25,12 @@ import java.util.stream.Stream
 internal class ProjectWizardStateTest {
 
     @ParameterizedTest
-    @MethodSource("rightMessageArs")
+    @MethodSource("rightMessageArgs")
     fun `should enum have the right message`(enum: ProjectWizardState, expected: String?) {
         enum.message shouldBe expected
     }
 
-    private fun rightMessageArs(): Stream<Arguments> =
+    private fun rightMessageArgs(): Stream<Arguments> =
         Stream.of(
             Arguments.of(ProjectWizardState.NOT_INSTALLED, "Please install STK CLI before continue."),
             Arguments.of(ProjectWizardState.STACKFILES_EMPTY, "Please import a stack with stackfiles before continue."),
