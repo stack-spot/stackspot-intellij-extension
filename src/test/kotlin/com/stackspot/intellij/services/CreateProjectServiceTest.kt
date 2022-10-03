@@ -109,7 +109,7 @@ internal class CreateProjectServiceTest {
         @Test
         fun `service state should be OK`() {
             every { importedStacks.hasStackFiles() } returns true
-            val service = CreateProjectService(importedStacks)
+            val service = CreateProjectService(importedStacks, isInstalled = true)
             service.state shouldBe ProjectWizardState.OK
             verify { importedStacks.hasStackFiles() }
             confirmVerified(importedStacks)
@@ -118,7 +118,7 @@ internal class CreateProjectServiceTest {
         @Test
         fun `should add git config`() {
             every { gitConfigCmd.run() } just runs
-            val service = CreateProjectService(gitConfigCmd = gitConfigCmd)
+            val service = CreateProjectService(gitConfigCmd = gitConfigCmd, isInstalled = true)
             service.addGitConfig("aaa", "b@b.com")
             await.atMost(500, TimeUnit.MILLISECONDS)
                 .untilAsserted {
