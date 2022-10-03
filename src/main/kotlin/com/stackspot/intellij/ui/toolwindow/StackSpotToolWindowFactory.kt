@@ -23,6 +23,7 @@ import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.content.Content
 import com.intellij.ui.content.ContentFactory
 import com.stackspot.intellij.actions.ImportStackAction
+import com.stackspot.intellij.actions.RefreshAction
 import com.stackspot.intellij.actions.UpdateAllStacksAction
 
 class StackSpotToolWindowFactory : ToolWindowFactory, DumbAware {
@@ -31,6 +32,6 @@ class StackSpotToolWindowFactory : ToolWindowFactory, DumbAware {
         val contentFactory = ContentFactory.SERVICE.getInstance()
         val content: Content = contentFactory.createContent(stackSpotToolWindow.getContent(), "", false)
         toolWindow.contentManager.addContent(content)
-        toolWindow.setTitleActions(listOf(ImportStackAction(), UpdateAllStacksAction()))
+        toolWindow.setTitleActions(listOf(RefreshAction(), ImportStackAction(), UpdateAllStacksAction()))
     }
 }

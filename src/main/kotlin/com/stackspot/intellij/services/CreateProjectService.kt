@@ -17,16 +17,19 @@
 package com.stackspot.intellij.services
 
 import com.intellij.openapi.components.Service
-import com.intellij.util.io.exists
 import com.stackspot.constants.Constants
 import com.stackspot.intellij.commands.BackgroundCommandRunner
 import com.stackspot.intellij.commands.git.GitConfig
+import com.stackspot.intellij.commands.stk.Version
+import com.stackspot.intellij.commons.singleThread
 import com.stackspot.intellij.services.enums.ProjectWizardState
 import com.stackspot.model.ImportedStacks
 import com.stackspot.model.Stack
 import com.stackspot.model.Stackfile
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+
+private const val STK_VERSION_MESSAGE = "stk version"
 
 @Service
 class CreateProjectService {
@@ -35,9 +38,9 @@ class CreateProjectService {
     var stackfile: Stackfile? = null
     val state: ProjectWizardState
         get() {
-            return if (!Constants.Paths.STK_BIN.exists()) {
+            return if (!getStkVersion().contains(STK_VERSION_MESSAGE)) {
                 ProjectWizardState.NOT_INSTALLED
-            } else if (!ImportedStacks().hasStackFiles()) {
+            } else if (!ImportedStacks.hasStackFiles()) {
                 ProjectWizardState.STACKFILES_EMPTY
             } else if (!isGitConfigOk()) {
                 ProjectWizardState.GIT_CONFIG_NOT_OK
@@ -45,6 +48,14 @@ class CreateProjectService {
                 ProjectWizardState.OK
             }
         }
+
+    private fun getStkVersion(): String {
+       return  singleThread {
+           val stkVersion = Version()
+           stkVersion.run()
+           (stkVersion.runner as BackgroundCommandRunner).stdout
+       }
+    }
 
     fun isStackfileSelected(): Boolean = stack != null && stackfile != null
 
@@ -70,6 +81,7 @@ class CreateProjectService {
     }
 
     private fun isGitConfigOk(): Boolean {
+
         var done = false
         var username = ""
         var email = ""

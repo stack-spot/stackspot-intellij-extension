@@ -18,7 +18,6 @@ package com.stackspot.constants
 
 import java.nio.file.Path
 import kotlin.io.path.Path
-import kotlin.io.path.exists
 
 object Constants {
     const val MODULE_TYPE = "STACK_SPOT_TYPE"
@@ -26,17 +25,10 @@ object Constants {
 
     object Files {
         const val STK_YAML = "stk.yaml"
-        const val STACK_YML = "stack.yml"
-        const val STACK_YAML = "stack.yaml"
-        const val PLUGIN_YML = "plugin.yml"
-        const val PLUGIN_YAML = "plugin.yaml"
-        const val TEMPLATE_YML = "template.yml"
-        const val TEMPLATE_YAML = "template.yaml"
     }
 
     object Paths {
-        val USER_HOME: Path = Path(System.getProperty("user.home"))
+        private val USER_HOME: Path = Path(System.getProperty("user.home"))
         val STK_HOME: Path = USER_HOME.resolve(".stk")
-        val STK_BIN: Path = STK_HOME.resolve("bin")
     }
 }

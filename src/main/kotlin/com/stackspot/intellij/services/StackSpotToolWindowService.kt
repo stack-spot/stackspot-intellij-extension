@@ -21,12 +21,12 @@ import com.intellij.openapi.project.Project
 import com.stackspot.model.AppliedTemplate
 import com.stackspot.model.History
 import com.stackspot.model.ImportedStacks
-import com.stackspot.yaml.parseHistory
+import com.stackspot.jackson.parseHistory
 import java.io.File
 
 @Service
 class StackSpotToolWindowService {
-    val importedStacks = ImportedStacks()
+    val importedStacks = ImportedStacks
     var project: Project? = null
     var history: History? = null
     var template: AppliedTemplate? = null

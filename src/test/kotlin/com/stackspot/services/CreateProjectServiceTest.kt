@@ -16,14 +16,17 @@
 
 package com.stackspot.services
 
+import com.jayway.jsonpath.JsonPath
 import com.stackspot.intellij.services.CreateProjectService
 import com.stackspot.model.Stack
 import com.stackspot.model.Stackfile
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import java.util.stream.Stream
+
 
 class CreateProjectServiceTest {
 
@@ -44,6 +47,52 @@ class CreateProjectServiceTest {
     ) {
         val service = CreateProjectService().saveInfo(stack, stackfile)
         Assertions.assertEquals(service.isStackfileSelected(), expected)
+    }
+
+    @Test
+    fun `test`() {
+        val json = """
+        {
+            "store": {
+            "book": [
+            {
+                "category": "reference",
+                "author": "Nigel Rees",
+                "title": "Sayings of the Century",
+                "price": 8.95
+            },
+            {
+                "category": "fiction",
+                "author": "Evelyn Waugh",
+                "title": "Sword of Honour",
+                "price": 12.99
+            },
+            {
+                "category": "fiction",
+                "author": "Herman Melville",
+                "title": "Moby Dick",
+                "isbn": "0-553-21311-3",
+                "price": 8.99
+            },
+            {
+                "category": "fiction",
+                "author": "J. R. R. Tolkien",
+                "title": "The Lord of the Rings",
+                "isbn": "0-395-19395-8",
+                "price": 22.99
+            }
+            ],
+            "bicycle": {
+            "color": "red",
+            "price": 19.95
+        }
+        },
+            "expensive": 10
+        }
+        """
+
+        val book = JsonPath.read<Map<String, Any>>(json, "$.store.book[0]")
+        println(book)
     }
 
     private companion object {

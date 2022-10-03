@@ -39,7 +39,8 @@ data class History(
     fun getCompatiblePlugins(): Map<Stack, List<Plugin>> {
         val compatiblePlugins = LinkedHashMap<Stack, List<Plugin>>()
         val type = getTemplateType()
-        ImportedStacks().list().filter {
+
+        ImportedStacks.list().filter {
             it.filterPluginsByType(type).isNotEmpty()
         }.sortedBy { s ->
             if (s.name == stack) {

@@ -17,9 +17,13 @@
 package com.stackspot.model
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.stackspot.yaml.parsePluginYaml
-import com.stackspot.yaml.parseStackfile
-import com.stackspot.yaml.parseTemplateYaml
+import com.intellij.util.containers.isNullOrEmpty
+import com.stackspot.intellij.commands.stk.CommandInfoList
+import com.stackspot.intellij.services.enums.Command
+import com.stackspot.jackson.*
+import com.stackspot.model.cli.CliPlugin
+import com.stackspot.model.cli.CliStackfile
+import com.stackspot.model.cli.CliTemplate
 import java.io.File
 import java.util.*
 
@@ -29,76 +33,84 @@ data class Stack(
     val displayName: String? = null,
     @JsonProperty("display-name") val displayNameKebab: String? = null,
     val useCases: List<StackUseCase>? = null,
-    @JsonProperty("use-cases") val useCasesKebab: List<StackUseCase>? = null
+    @JsonProperty("use-cases") val useCasesKebab: List<StackUseCase>? = null,
 ) {
     lateinit var location: File
+    lateinit var pluginsMap: Map<String, List<CliPlugin>>
+    lateinit var templatesMap: Map<String, List<CliTemplate>>
+    lateinit var stackfilesMap: Map<String, List<CliStackfile>>
 
     fun filterTemplatesByType(type: TemplateType): List<Template> {
-        return location.walk().filter {
-            it.isDirectory && isTemplateOfType(it, type.templateType)
-        }.mapNotNull {
-            it.parseTemplateYaml(this)
-        }.toList()
+        val templatesList = templatesMap.getOrDefault(name, listOf())
+
+        return templatesList
+            .filter { isTemplateOfType(it, type.pluginType) }
+            .map { it.path.parseTemplateYaml(this) }
     }
 
     fun filterPluginsByType(type: TemplateType): List<Plugin> {
-        return location.walk().filter {
-            it.isDirectory && isTemplateOfType(it, type.pluginType)
-        }.mapNotNull {
-            it.parsePluginYaml(this)
-        }.toList()
+        println("filterPluginsByType")
+        val pluginsList = pluginsMap.getOrDefault(name, listOf())
+        return pluginsList
+            .filter { isTemplateOfType(it, type.pluginType) }
+            .map { it.path.parsePluginYaml(this) }
     }
 
-    fun getTemplateByName(name: String): Template? {
-        return location.walk().filter {
-            it.isDirectory && name.equals(it.name, true)
-        }.mapNotNull {
-            it.parseTemplateYaml(this)
-        }.firstOrNull()
+    fun getTemplateByName(componentName: String): Template? {
+        println("getTemplateByName")
+        val pathsList = templatesMap.getOrDefault(this.name, listOf())
+        return pathsList
+            .filter { it.name == componentName  }
+            .map { it.path.parseTemplateYaml(this) }
+            .firstOrNull()
     }
 
-    fun getPluginByName(name: String): Plugin? {
-        return location.walk().filter {
-            it.isDirectory && name.equals(it.name, true)
-        }.mapNotNull {
-            it.parsePluginYaml(this)
-        }.firstOrNull()
+    fun getPluginByName(componentName: String?): Plugin {
+        println("getPluginByName")
+        val pluginsList = pluginsMap.getOrDefault(name, listOf())
+        return pluginsList
+            .filter{ it.name == componentName }
+            .map { it.path.parsePluginYaml(this) }
+            .first()
     }
 
-    fun listCompatiblePluginsByStackType(stackType: String): List<Plugin> {
-        val templateType = if (stackType == "env") {
-            TemplateType.ENV
-        } else {
-            TemplateType.APP
+//    private fun pluginPathsListByPath(basePath: String): List<String> {
+//        return CommandInfoList(
+//            command = Command.PLUGIN.value,
+//            workingDir = basePath
+//        )
+//            .runSync()
+//            .stdout
+//            .parseJsonToGetPaths()
+//    }
+
+    fun listStackfiles(
+        filterByStack: Boolean = true
+    ): List<Stackfile> {
+        println("listStackfiles")
+        var pathsList = stackfilesMap.values.flatten()
+
+        if (filterByStack) {
+            pathsList = stackfilesMap.getOrDefault(name, listOf())
         }
-        return filterPluginsByType(templateType)
-    }
 
-    fun listStackfiles(): List<Stackfile> {
-        return location.toPath().resolve("stackfiles").toFile()
-            .walk()
-            .filter { it.name.endsWith(".yaml") }
-            .map { it.parseStackfile() }
-            .toList()
+        return pathsList.map { it.path.parseStackfile() }
     }
 
     fun listPlugins(): List<Plugin> {
-        return location.walk().filter {
-            it.isDirectory
-        }.filter {
-            val template = it.parseTemplateYaml(this)
-            template != null && (template.types.contains(TemplateType.APP.pluginType) || template.types.contains(
-                TemplateType.APP.pluginType
-            ))
-        }.mapNotNull {
-            it.parsePluginYaml(this)
-        }.toList()
+        println("listStackfiles")
+        return filterPluginsByType(TemplateType.APP)
     }
 
-    private fun isTemplateOfType(dir: File, templateType: String): Boolean {
-        val template = dir.parseTemplateYaml(this) ?: return false
-        return template.types.contains(templateType)
+    private fun isTemplateOfType(template: CliTemplate, templateType: String): Boolean {
+        return isPathFromStack(template.path) && template.types.contains(templateType)
     }
+
+    private fun isPathFromStack(path: String): Boolean {
+        val stackPath = location.toPath().toString()
+        return path.contains(stackPath)
+    }
+
 
     override fun toString(): String {
         return displayNameKebab ?: (displayName ?: name)

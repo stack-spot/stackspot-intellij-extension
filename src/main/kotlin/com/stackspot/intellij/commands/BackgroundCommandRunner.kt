@@ -18,9 +18,14 @@ package com.stackspot.intellij.commands
 
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.util.ExecUtil.execAndGetOutput
+import com.stackspot.intellij.commons.singleThread
+import com.stackspot.intellij.commons.singleThreadAsCoroutine
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import java.nio.charset.Charset
 
-class BackgroundCommandRunner(private val workingDir: String) : CommandRunner {
+class BackgroundCommandRunner(private val workingDir: String? = null) : CommandRunner {
 
     var stdout: String = ""
         get() {
@@ -37,5 +42,41 @@ class BackgroundCommandRunner(private val workingDir: String) : CommandRunner {
         stdout = processOutput.stdout
         stderr = processOutput.stderr
         listener?.notifyEnded()
+    }
+
+    override fun runSync(
+        commandLine: List<String>
+    ): BackgroundCommandRunner {
+
+        println(commandLine)
+        return singleThread {
+            var done = false
+            this.run(commandLine, object : CommandRunner.CommandEndedListener {
+                override fun notifyEnded() {
+                    done = true
+                }
+            })
+
+            while (!done) {
+                Thread.sleep(1L)
+            }
+            this
+        }
+    }
+
+    override suspend fun runAsync(
+        commandLine: List<String>
+    ): Deferred<BackgroundCommandRunner> {
+
+        println(commandLine)
+        var done = false
+        return singleThreadAsCoroutine {
+            this.run(commandLine, object : CommandRunner.CommandEndedListener {
+                override fun notifyEnded() {
+                    done = true
+                }
+            })
+            this
+        }
     }
 }

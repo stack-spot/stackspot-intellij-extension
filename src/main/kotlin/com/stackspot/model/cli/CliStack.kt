@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
-package com.stackspot.yaml
+package com.stackspot.model.cli
 
-class YamlNotFoundError(message: String) : RuntimeException(message)
+class CliStack(
+    val description: String,
+    val name: String,
+    val path: String
+)

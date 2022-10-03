@@ -28,7 +28,9 @@ import com.intellij.ui.content.Content
 import com.intellij.ui.content.ContentManager
 import com.jediterm.terminal.model.TerminalModelListener
 import com.stackspot.constants.Constants
+import com.stackspot.intellij.commands.BackgroundCommandRunner
 import com.stackspot.intellij.commands.CommandRunner
+import kotlinx.coroutines.Deferred
 import org.jetbrains.plugins.terminal.ShellTerminalWidget
 import org.jetbrains.plugins.terminal.TerminalTabState
 import org.jetbrains.plugins.terminal.TerminalToolWindowFactory
@@ -84,6 +86,16 @@ class StackSpotTerminalRunner(private val project: Project, private val workingD
         if (window != null) {
             executeCommandInTerminal(window, listener, commandLine)
         }
+    }
+
+    override fun runSync(
+        commandLine: List<String>
+    ): BackgroundCommandRunner {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun runAsync(commandLine: List<String>): Deferred<BackgroundCommandRunner> {
+        TODO("Not yet implemented")
     }
 
     private fun resolveWorkingDir() = workingDir ?: project.basePath
