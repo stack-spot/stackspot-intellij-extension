@@ -91,7 +91,6 @@ internal class CreateProjectServiceTest {
     }
 
     @Nested
-    @Disabled
     inner class SuccessCases {
         @Test
         fun `should clear service attributes`() {
