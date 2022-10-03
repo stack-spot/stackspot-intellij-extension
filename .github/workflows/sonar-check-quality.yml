@@ -36,4 +36,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_IDE_PIPELINE_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_PIPELINES_HOST_URL }}
-        run: ./gradlew build sonarqube --info
+        run: ./gradlew buildPlugin sonarqube --info
