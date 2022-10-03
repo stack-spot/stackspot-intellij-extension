@@ -51,7 +51,7 @@ internal class CreateProjectServiceTest {
         @Test
         fun `service state should be STACKFILES_EMPTY`() {
             every { importedStacks.hasStackFiles() } returns false
-            val service = CreateProjectService(importedStacks)
+            val service = CreateProjectService(importedStacks, isInstalled = true)
             service.state shouldBe ProjectWizardState.STACKFILES_EMPTY
             verify { importedStacks.hasStackFiles() }
             confirmVerified(importedStacks)
@@ -67,7 +67,7 @@ internal class CreateProjectServiceTest {
         fun `service state should be GIT_CONFIG_NOT_OK`() {
             every { importedStacks.hasStackFiles() } returns true
             every { (gitConfigCmd.runner as BackgroundCommandRunner).stdout } returns ""
-            val service = CreateProjectService(importedStacks, gitConfigCmd = gitConfigCmd)
+            val service = CreateProjectService(importedStacks, gitConfigCmd = gitConfigCmd, isInstalled = true)
             service.state shouldBe ProjectWizardState.GIT_CONFIG_NOT_OK
             verify { importedStacks.hasStackFiles() }
             verify { gitConfigCmd.run() }
