@@ -146,16 +146,16 @@ internal class CreateProjectServiceTest {
             }
         }
 
-        @ParameterizedTest
-        @MethodSource("stackfileIsSelectedArgs")
-        fun `should check if stackfile is selected`(
-            stack: Stack?,
-            stackfile: Stackfile?,
-            expected: Boolean
-        ) {
-            val service = CreateProjectService().saveInfo(stack, stackfile)
-            service.isStackfileSelected() shouldBe expected
-        }
+//        @ParameterizedTest
+//        @MethodSource("stackfileIsSelectedArgs")
+//        fun `should check if stackfile is selected`(
+//            stack: Stack?,
+//            stackfile: Stackfile?,
+//            expected: Boolean
+//        ) {
+//            val service = CreateProjectService().saveInfo(stack, stackfile)
+//            service.isStackfileSelected() shouldBe expected
+//        }
 
         private fun stackfileIsSelectedArgs(): Stream<Arguments> =
             Stream.of(
