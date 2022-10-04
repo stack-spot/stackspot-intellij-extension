@@ -48,6 +48,7 @@ internal class CreateProjectServiceTest {
 
     @Nested
     inner class FailureCases {
+
         @Test
         fun `service state should be STACKFILES_EMPTY`() {
             every { importedStacks.hasStackFiles() } returns false
@@ -95,6 +96,7 @@ internal class CreateProjectServiceTest {
 
     @Nested
     inner class SuccessCases {
+
         @Test
         fun `should clear service attributes`() {
             val service = CreateProjectService().saveInfo(createStack(), createStackfile())
@@ -109,9 +111,11 @@ internal class CreateProjectServiceTest {
         @Test
         fun `service state should be OK`() {
             every { importedStacks.hasStackFiles() } returns true
-            val service = CreateProjectService(importedStacks, isInstalled = true)
+            every { (gitConfigCmd.runner as BackgroundCommandRunner).stdout } returns "ok"
+            val service = CreateProjectService(importedStacks, isInstalled = true, gitConfigCmd = gitConfigCmd)
             service.state shouldBe ProjectWizardState.OK
             verify { importedStacks.hasStackFiles() }
+            verify(exactly = 2) { gitConfigCmd.run() }
             confirmVerified(importedStacks)
         }
 
