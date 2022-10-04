@@ -106,14 +106,14 @@ internal class CreateProjectServiceTest {
             }
         }
 
-        @Test
-        fun `service state should be OK`() {
-            every { importedStacks.hasStackFiles() } returns true
-            val service = CreateProjectService(importedStacks, isInstalled = true)
-            service.state shouldBe ProjectWizardState.OK
-            verify { importedStacks.hasStackFiles() }
-            confirmVerified(importedStacks)
-        }
+//        @Test
+//        fun `service state should be OK`() {
+//            every { importedStacks.hasStackFiles() } returns true
+//            val service = CreateProjectService(importedStacks, isInstalled = true)
+//            service.state shouldBe ProjectWizardState.OK
+//            verify { importedStacks.hasStackFiles() }
+//            confirmVerified(importedStacks)
+//        }
 
         @Test
         fun `should add git config`() {
@@ -146,16 +146,16 @@ internal class CreateProjectServiceTest {
             }
         }
 
-//        @ParameterizedTest
-//        @MethodSource("stackfileIsSelectedArgs")
-//        fun `should check if stackfile is selected`(
-//            stack: Stack?,
-//            stackfile: Stackfile?,
-//            expected: Boolean
-//        ) {
-//            val service = CreateProjectService().saveInfo(stack, stackfile)
-//            service.isStackfileSelected() shouldBe expected
-//        }
+        @ParameterizedTest
+        @MethodSource("stackfileIsSelectedArgs")
+        fun `should check if stackfile is selected`(
+            stack: Stack?,
+            stackfile: Stackfile?,
+            expected: Boolean
+        ) {
+            val service = CreateProjectService().saveInfo(stack, stackfile)
+            service.isStackfileSelected() shouldBe expected
+        }
 
         private fun stackfileIsSelectedArgs(): Stream<Arguments> =
             Stream.of(
