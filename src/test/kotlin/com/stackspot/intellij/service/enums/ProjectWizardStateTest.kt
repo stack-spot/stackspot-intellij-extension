@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.stackspot.intellij.services.enums
+package com.stackspot.intellij.service.enums
 
+import com.stackspot.intellij.services.enums.ProjectWizardState
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments

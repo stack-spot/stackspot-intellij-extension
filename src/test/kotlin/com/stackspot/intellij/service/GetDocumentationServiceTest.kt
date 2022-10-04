@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package com.stackspot.intellij.services
+package com.stackspot.intellij.service
 
 import com.stackspot.intellij.commands.git.GitBranch
 import com.stackspot.intellij.commands.git.GitConfig
+import com.stackspot.intellij.services.GetDocumentationService
 import com.stackspot.model.Stack
 import com.stackspot.yaml.YamlResourceUtils
 import io.kotest.matchers.shouldBe

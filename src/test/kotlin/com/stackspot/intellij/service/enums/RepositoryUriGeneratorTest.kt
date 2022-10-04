@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.stackspot.intellij.services.enums
+package com.stackspot.intellij.service.enums
 
 import com.stackspot.exceptions.NotFoundException
 import com.stackspot.intellij.services.enums.RepositoryUriGenerator

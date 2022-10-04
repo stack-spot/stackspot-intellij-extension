@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package com.stackspot.intellij.services
+package com.stackspot.intellij.service
 
 import com.stackspot.intellij.commands.BackgroundCommandRunner
 import com.stackspot.intellij.commands.git.GitConfig
+import com.stackspot.intellij.services.CreateProjectService
 import com.stackspot.intellij.services.enums.ProjectWizardState
 import com.stackspot.model.ImportedStacks
 import com.stackspot.model.Stack
