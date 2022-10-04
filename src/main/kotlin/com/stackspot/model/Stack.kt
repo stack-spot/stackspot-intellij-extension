@@ -17,10 +17,9 @@
 package com.stackspot.model
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.intellij.util.containers.isNullOrEmpty
-import com.stackspot.intellij.commands.stk.CommandInfoList
-import com.stackspot.intellij.services.enums.Command
-import com.stackspot.jackson.*
+import com.stackspot.jackson.parsePluginYaml
+import com.stackspot.jackson.parseStackfile
+import com.stackspot.jackson.parseTemplateYaml
 import com.stackspot.model.cli.CliPlugin
 import com.stackspot.model.cli.CliStackfile
 import com.stackspot.model.cli.CliTemplate
@@ -39,14 +38,6 @@ data class Stack(
     lateinit var pluginsMap: Map<String, List<CliPlugin>>
     lateinit var templatesMap: Map<String, List<CliTemplate>>
     lateinit var stackfilesMap: Map<String, List<CliStackfile>>
-
-    fun filterTemplatesByType(type: TemplateType): List<Template> {
-        val templatesList = templatesMap.getOrDefault(name, listOf())
-
-        return templatesList
-            .filter { isTemplateOfType(it, type.pluginType) }
-            .map { it.path.parseTemplateYaml(this) }
-    }
 
     fun filterPluginsByType(type: TemplateType): List<Plugin> {
         println("filterPluginsByType")
@@ -74,16 +65,6 @@ data class Stack(
             .first()
     }
 
-//    private fun pluginPathsListByPath(basePath: String): List<String> {
-//        return CommandInfoList(
-//            command = Command.PLUGIN.value,
-//            workingDir = basePath
-//        )
-//            .runSync()
-//            .stdout
-//            .parseJsonToGetPaths()
-//    }
-
     fun listStackfiles(
         filterByStack: Boolean = true
     ): List<Stackfile> {
@@ -103,12 +84,7 @@ data class Stack(
     }
 
     private fun isTemplateOfType(template: CliTemplate, templateType: String): Boolean {
-        return isPathFromStack(template.path) && template.types.contains(templateType)
-    }
-
-    private fun isPathFromStack(path: String): Boolean {
-        val stackPath = location.toPath().toString()
-        return path.contains(stackPath)
+        return template.types.contains(templateType)
     }
 
 

@@ -71,7 +71,7 @@ class GetDocumentationService {
     }
 
     private fun getRemoteUrl(stack: Stack): String {
-        val gitRemoteCmd = GitConfig(stack.location.toPath().toString(), arrayOf("--get", "remote.origin.url"))
+        val gitRemoteCmd = GitConfig(stack.location.toPath().parent.toString(), arrayOf("--get", "remote.origin.url"))
         gitRemoteCmd.run()
         return (gitRemoteCmd.runner as BackgroundCommandRunner).stdout
     }

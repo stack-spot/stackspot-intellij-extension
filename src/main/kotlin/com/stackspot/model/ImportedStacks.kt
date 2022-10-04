@@ -28,66 +28,48 @@ import com.stackspot.model.cli.CliPlugin
 import com.stackspot.model.cli.CliStack
 import com.stackspot.model.cli.CliStackfile
 import com.stackspot.model.cli.CliTemplate
-import kotlinx.coroutines.*
-import kotlin.system.measureTimeMillis
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 object ImportedStacks {
 
     init {
-        val measureTimeMillis = measureTimeMillis {
-//            loadMapsAndLists()
-            load()
-        }
-        println("TOTAL $measureTimeMillis")
-        //            println("Took: ${Duration.between(start, Instant.now()).toMillis()}ms to execute")
+            loadMapsAndLists()
     }
 
-    lateinit var pluginsMap: Map<String, List<CliPlugin>>
-    lateinit var templatesMap: Map<String, List<CliTemplate>>
-    lateinit var stackfilesMap: Map<String, List<CliStackfile>>
-    lateinit var stacksList: List<CliStack>
+    lateinit var pluginsPathMap: Map<String, List<CliPlugin>>
+    lateinit var templatesPathMap: Map<String, List<CliTemplate>>
+    lateinit var stackfilesPathMap: Map<String, List<CliStackfile>>
+    lateinit var stacksPathList: List<CliStack>
 
 
     private fun loadMapsAndLists() {
         runBlocking {
             launch {
-                stacksList = getCommandInfoList(Command.STACK).parseJsonToList<CliStack>()
+                stacksPathList = getCommandInfoList(Command.STACK).parseJsonToList()
             }
 
             launch {
-                stackfilesMap = getCommandInfoList(Command.STACKFILE).parseJsonToMapWithList<CliStackfile>()
+                stackfilesPathMap = getCommandInfoList(Command.STACKFILE).parseJsonToMapWithList()
             }
 
             launch {
-                templatesMap = getCommandInfoList(Command.TEMPLATE).parseJsonToMapWithList<CliTemplate>()
+                templatesPathMap = getCommandInfoList(Command.TEMPLATE).parseJsonToMapWithList()
             }
 
             launch {
-                pluginsMap = getCommandInfoList(Command.PLUGIN).parseJsonToMapWithList<CliPlugin>()
+                pluginsPathMap = getCommandInfoList(Command.PLUGIN).parseJsonToMapWithList()
             }
         }
-    }
-
-//    private val pluginsMap = getCommandInfoList(Command.PLUGIN).parseJsonToMapWithList<CliPlugin>()
-//    private val templatesMap = getCommandInfoList(Command.TEMPLATE).parseJsonToMapWithList<CliTemplate>()
-//    private val stackfilesMap = getCommandInfoList(Command.STACKFILE).parseJsonToMapWithList<CliStackfile>()
-//    private val stacksList = getCommandInfoList(Command.STACK).parseJsonToList<CliStack>()
-
-
-    private fun load() {
-        pluginsMap = getCommandInfoList(Command.PLUGIN).parseJsonToMapWithList<CliPlugin>()
-        templatesMap = getCommandInfoList(Command.TEMPLATE).parseJsonToMapWithList<CliTemplate>()
-        stackfilesMap = getCommandInfoList(Command.STACKFILE).parseJsonToMapWithList<CliStackfile>()
-        stacksList = getCommandInfoList(Command.STACK).parseJsonToList<CliStack>()
     }
 
     fun hasStackFiles() = list().any { it.listStackfiles(filterByStack = false).isNotEmpty() }
 
     fun list(): List<Stack> {
         println("STACK")
-        return stacksList
+        return stacksPathList
             .map {
-                it.path.parseStackYaml(pluginsMap, templatesMap, stackfilesMap)
+                it.path.parseStackYaml(pluginsPathMap, templatesPathMap, stackfilesPathMap)
             }.sortedBy {
                 it.name.lowercase()
             }
@@ -105,13 +87,9 @@ object ImportedStacks {
         return list().firstOrNull { it.name == name }
     }
 
-    private fun getCommandInfoList(command: Command): String {
-        return CommandInfoList(command.value).runSync().stdout
+    private suspend fun getCommandInfoList(command: Command): String {
+        return CommandInfoList(command.value).runAsync().await().stdout
     }
-
-//    private suspend fun getCommandInfoList(command: Command): String {
-//        return CommandInfoList(command.value).runAsync().await().stdout
-//    }
 
     fun reload() {
         loadMapsAndLists()
