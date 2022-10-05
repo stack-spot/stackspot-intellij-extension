@@ -1,0 +1,7 @@
+name: default-stack
+description: Default Stack YAML
+displayName: Default Stack
+category: Backend
+useCases:
+  - title: Default Stack Use Case
+    content: use-case.md

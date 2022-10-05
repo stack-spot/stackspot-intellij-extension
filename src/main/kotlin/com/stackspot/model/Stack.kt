@@ -87,7 +87,6 @@ data class Stack(
         return template.types.contains(templateType)
     }
 
-
     override fun toString(): String {
         return displayNameKebab ?: (displayName ?: name)
     }

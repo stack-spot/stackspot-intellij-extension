@@ -41,9 +41,12 @@ enum class RepositoryUriGenerator(private val domainName: Array<String>? = null)
         }
     };
 
+    abstract fun generateUri(branchName: String): String
+
     companion object {
         fun findByName(name: String): RepositoryUriGenerator =
-            RepositoryUriGenerator.values().find { enum -> enum.name.contains(name, ignoreCase = true) } ?: UNKNOWN
+            RepositoryUriGenerator.values()
+                .find { enum -> name.isNotEmpty() && enum.name.contains(name, ignoreCase = true) } ?: UNKNOWN
 
         fun findByDomainName(domainName: String): RepositoryUriGenerator {
             var repository: RepositoryUriGenerator = UNKNOWN
@@ -55,7 +58,5 @@ enum class RepositoryUriGenerator(private val domainName: Array<String>? = null)
             return repository
         }
     }
-
-    abstract fun generateUri(branchName: String): String
 
 }

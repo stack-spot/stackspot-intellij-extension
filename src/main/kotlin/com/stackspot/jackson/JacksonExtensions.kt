@@ -28,8 +28,10 @@ import com.stackspot.model.*
 import com.stackspot.model.cli.CliPlugin
 import com.stackspot.model.cli.CliStackfile
 import com.stackspot.model.cli.CliTemplate
+import com.stackspot.jackson.JacksonExtensions
 import org.apache.commons.lang3.StringUtils
 import java.io.File
+import java.io.InputStream
 import java.time.Duration
 import java.time.Instant
 
@@ -138,4 +140,16 @@ fun String.parseStackfile(): Stackfile {
     }
 
     return stackfile
+}
+
+fun <T> InputStream.yamlToObject(clazz: Class<T>): T =
+    JacksonExtensions.objectMapperYaml.readValue(this, clazz)
+
+object YamlResourceUtils {
+
+    fun <T> readYaml(resourcePath: String, clazz: Class<T>): T? {
+        val resourceAsStream = javaClass.classLoader.getResourceAsStream(resourcePath)
+        return resourceAsStream?.yamlToObject(clazz)
+    }
+
 }
