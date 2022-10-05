@@ -78,13 +78,11 @@ fun String.parseJsonToGetPaths(): List<String> {
 }
 
 inline fun <reified T> String.parseJsonToMapWithList(): HashMap<String, List<T>> {
-    println("Order: $this")
     val typeRef: TypeReference<HashMap<String, List<T>>> = object : TypeReference<HashMap<String, List<T>>>() {}
     return JacksonExtensions.objectMapperJson.readValue(this, typeRef)
 }
 
 inline fun <reified T> String.parseJsonToList(): List<T> {
-    println("Order Stack: $this")
     val typeRef: TypeReference<List<T>> = object : TypeReference<List<T>>() {}
     return JacksonExtensions.objectMapperJson.readValue(this, typeRef)
 }

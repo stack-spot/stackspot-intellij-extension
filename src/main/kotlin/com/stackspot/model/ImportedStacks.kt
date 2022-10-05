@@ -16,11 +16,8 @@
 
 package com.stackspot.model
 
-import com.stackspot.intellij.commands.BackgroundCommandRunner
 import com.stackspot.intellij.commands.stk.CommandInfoList
-import com.stackspot.intellij.commons.singleThread
 import com.stackspot.intellij.services.enums.Command
-import com.stackspot.jackson.parseJsonToGetPaths
 import com.stackspot.jackson.parseJsonToList
 import com.stackspot.jackson.parseJsonToMapWithList
 import com.stackspot.jackson.parseStackYaml
@@ -66,21 +63,12 @@ object ImportedStacks {
     fun hasStackFiles() = list().any { it.listStackfiles(filterByStack = false).isNotEmpty() }
 
     fun list(): List<Stack> {
-        println("STACK")
         return stacksPathList
             .map {
                 it.path.parseStackYaml(pluginsPathMap, templatesPathMap, stackfilesPathMap)
             }.sortedBy {
                 it.name.lowercase()
             }
-    }
-
-    private fun pathsList(): List<String> {
-        return singleThread {
-            val stackList = CommandInfoList(Command.STACK.value)
-            stackList.run()
-            (stackList.runner as BackgroundCommandRunner).stdout
-        }.parseJsonToGetPaths()
     }
 
     fun getByName(name: String): Stack? {

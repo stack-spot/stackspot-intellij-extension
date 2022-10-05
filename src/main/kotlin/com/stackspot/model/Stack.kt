@@ -40,7 +40,6 @@ data class Stack(
     lateinit var stackfilesMap: Map<String, List<CliStackfile>>
 
     fun filterPluginsByType(type: TemplateType): List<Plugin> {
-        println("filterPluginsByType")
         val pluginsList = pluginsMap.getOrDefault(name, listOf())
         return pluginsList
             .filter { isTemplateOfType(it, type.pluginType) }
@@ -48,7 +47,6 @@ data class Stack(
     }
 
     fun getTemplateByName(componentName: String): Template? {
-        println("getTemplateByName")
         val pathsList = templatesMap.getOrDefault(this.name, listOf())
         return pathsList
             .filter { it.name == componentName  }
@@ -57,7 +55,6 @@ data class Stack(
     }
 
     fun getPluginByName(componentName: String?): Plugin {
-        println("getPluginByName")
         val pluginsList = pluginsMap.getOrDefault(name, listOf())
         return pluginsList
             .filter{ it.name == componentName }
@@ -68,7 +65,6 @@ data class Stack(
     fun listStackfiles(
         filterByStack: Boolean = true
     ): List<Stackfile> {
-        println("listStackfiles")
         var pathsList = stackfilesMap.values.flatten()
 
         if (filterByStack) {
@@ -79,7 +75,6 @@ data class Stack(
     }
 
     fun listPlugins(): List<Plugin> {
-        println("listStackfiles")
         return filterPluginsByType(TemplateType.APP)
     }
 

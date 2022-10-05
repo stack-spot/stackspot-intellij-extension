@@ -52,7 +52,6 @@ class BackgroundCommandRunner(private var workingDir: String? = null) : CommandR
         commandLine: List<String>
     ): BackgroundCommandRunner {
 
-        println(commandLine)
         return singleThread {
             var done = false
             this.run(commandLine, object : CommandRunner.CommandEndedListener {
@@ -71,8 +70,6 @@ class BackgroundCommandRunner(private var workingDir: String? = null) : CommandR
     override suspend fun runAsync(
         commandLine: List<String>
     ): Deferred<BackgroundCommandRunner> {
-
-        println(commandLine)
         var done = false
         return singleThreadAsCoroutine {
             this.run(commandLine, object : CommandRunner.CommandEndedListener {
