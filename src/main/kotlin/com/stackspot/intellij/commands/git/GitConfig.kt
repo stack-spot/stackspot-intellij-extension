@@ -19,8 +19,10 @@ package com.stackspot.intellij.commands.git
 import com.stackspot.intellij.commands.BackgroundCommandRunner
 import com.stackspot.intellij.commands.BaseCommand
 
-class GitConfig(workingDirectory: String, private val flags: Array<String>) :
+class GitConfig(var workingDirectory: String) :
     BaseCommand(BackgroundCommandRunner(workingDirectory)) {
+
+    var flags: Array<String> = arrayOf()
 
     override fun commandLine(): List<String> {
         return listOf("git", "config", *flags)

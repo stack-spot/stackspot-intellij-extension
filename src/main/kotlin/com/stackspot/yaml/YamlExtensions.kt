@@ -24,6 +24,7 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.stackspot.constants.Constants
 import com.stackspot.model.*
 import java.io.File
+import java.io.InputStream
 
 object YamlExtensions {
 
@@ -119,4 +120,16 @@ fun File.parseStackfile(): Stackfile {
     val sf = this.parseYaml(Stackfile::class.java)
     sf.name = this.name.split(".").first()
     return sf
+}
+
+fun <T> InputStream.yamlToObject(clazz: Class<T>): T =
+    YamlExtensions.objectMapper.readValue(this, clazz)
+
+object YamlResourceUtils {
+
+    fun <T> readYaml(resourcePath: String, clazz: Class<T>): T? {
+        val resourceAsStream = javaClass.classLoader.getResourceAsStream(resourcePath)
+        return resourceAsStream?.yamlToObject(clazz)
+    }
+
 }

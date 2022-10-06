@@ -20,13 +20,16 @@ import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.util.ExecUtil.execAndGetOutput
 import java.nio.charset.Charset
 
-class BackgroundCommandRunner(private val workingDir: String) : CommandRunner {
+class BackgroundCommandRunner(private var workingDir: String) : CommandRunner {
 
     var stdout: String = ""
         get() {
             return field.replace("\\n".toRegex(), "")
         }
     lateinit var stderr: String
+    var exitCode: Int = 0
+    var timeout: Boolean = false
+    var cancelled: Boolean = false
 
     override fun run(commandLine: List<String>, listener: CommandRunner.CommandEndedListener?) {
         val generalCommandLine = GeneralCommandLine(commandLine)
@@ -36,6 +39,9 @@ class BackgroundCommandRunner(private val workingDir: String) : CommandRunner {
         val processOutput = execAndGetOutput(generalCommandLine)
         stdout = processOutput.stdout
         stderr = processOutput.stderr
+        exitCode = processOutput.exitCode
+        timeout = processOutput.isTimeout
+        cancelled = processOutput.isCancelled
         listener?.notifyEnded()
     }
 }
