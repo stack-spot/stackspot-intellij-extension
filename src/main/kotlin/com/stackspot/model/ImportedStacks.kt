@@ -27,7 +27,6 @@ import com.stackspot.model.cli.CliStackfile
 import com.stackspot.model.cli.CliTemplate
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlin.system.measureTimeMillis
 
 class ImportedStacks private constructor(
     private val stackInfoList: CommandInfoList,
@@ -39,7 +38,7 @@ class ImportedStacks private constructor(
     companion object : SingletonHolder(::ImportedStacks)
 
     init {
-        refreshCommandInfo()
+        reloadCommandInfo()
     }
 
     private lateinit var pluginsPathMap: Map<String, List<CliPlugin>>
@@ -47,7 +46,7 @@ class ImportedStacks private constructor(
     private lateinit var stackfilesPathMap: Map<String, List<CliStackfile>>
     private lateinit var stacksPathList: List<CliStack>
 
-    private fun refreshCommandInfo() {
+    private fun reloadCommandInfo() {
         runBlocking {
             launch {
                 stacksPathList = getCommandInfoList(stackInfoList, Command.STACK).parseJsonToList()
@@ -89,7 +88,7 @@ class ImportedStacks private constructor(
     }
 
     fun refresh() {
-        refreshCommandInfo()
+        reloadCommandInfo()
     }
 }
 

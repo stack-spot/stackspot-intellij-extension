@@ -18,7 +18,6 @@ package com.stackspot.intellij.commands.listeners
 
 import com.intellij.openapi.application.Application
 import com.intellij.openapi.application.ApplicationManager
-import com.intellij.util.messages.MessageBus
 import com.stackspot.intellij.commands.stk.CommandInfoList
 import com.stackspot.intellij.messaging.StackUpdatesNotifier
 import com.stackspot.model.ImportedStacks

@@ -69,6 +69,7 @@ fun <T> File.parseYaml(clazz: Class<T>): T {
 }
 
 const val CURLY_BRACKETS = "{}"
+
 inline fun <reified T> String.parseJsonToMapWithList(): HashMap<String, List<T>> {
     val content = if (this.contains(CURLY_BRACKETS)) CURLY_BRACKETS else this
     val typeRef: TypeReference<HashMap<String, List<T>>> = object : TypeReference<HashMap<String, List<T>>>() {}
