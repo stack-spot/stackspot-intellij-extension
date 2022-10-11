@@ -23,13 +23,19 @@ import com.stackspot.intellij.commands.listeners.NotifyStacksUpdatedCommandListe
 import com.stackspot.intellij.ui.Icons
 
 
-private const val REFRESH_ALL_STACKS = "Refresh"
+private const val REFRESH = "Refresh"
 
-class RefreshAction : AnAction(REFRESH_ALL_STACKS, REFRESH_ALL_STACKS, Icons.REFRESH), DumbAware {
+class RefreshAction() : AnAction(REFRESH, REFRESH, Icons.REFRESH), DumbAware {
+
+    private var listener: NotifyStacksUpdatedCommandListener = NotifyStacksUpdatedCommandListener()
+
+    constructor(listener: NotifyStacksUpdatedCommandListener): this() {
+        this.listener = listener
+    }
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project
         if (project != null) {
-            NotifyStacksUpdatedCommandListener().notifyEnded()
+            listener.notifyEnded()
         }
     }
 }

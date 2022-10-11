@@ -21,7 +21,6 @@ import com.stackspot.constants.Constants
 import com.stackspot.intellij.commands.BackgroundCommandRunner
 import com.stackspot.intellij.commands.git.GitConfig
 import com.stackspot.intellij.commands.stk.Version
-import com.stackspot.intellij.commons.singleThread
 import com.stackspot.intellij.services.enums.ProjectWizardState
 import com.stackspot.model.ImportedStacks
 import com.stackspot.model.Stack
@@ -38,9 +37,9 @@ class CreateProjectService() {
     var stackfile: Stackfile? = null
     val state: ProjectWizardState
         get() {
-            return if (!isInstalled) {
+            return if (!isInstalled()) {
                 ProjectWizardState.NOT_INSTALLED
-            } else if (!ImportedStacks.hasStackFiles()) {
+            } else if (!ImportedStacks.getInstance().hasStackFiles()) {
                 ProjectWizardState.STACKFILES_EMPTY
             } else if (!isGitConfigOk()) {
                 ProjectWizardState.GIT_CONFIG_NOT_OK
@@ -48,25 +47,22 @@ class CreateProjectService() {
                 ProjectWizardState.OK
             }
         }
-    private var isInstalled = !getStkVersion().contains(STK_VERSION_MESSAGE)
+
+    private var version = Version()
     private var gitConfigCmd = GitConfig(Constants.Paths.STK_HOME.toString())
 
     constructor(
-        isInstalled: Boolean,
+        version: Version = Version(),
         gitConfigCmd: GitConfig = GitConfig(Constants.Paths.STK_HOME.toString())
     ) : this() {
-        this.isInstalled = isInstalled
+        this.version = version
         this.gitConfigCmd = gitConfigCmd
     }
 
-    private fun getStkVersion(): String {
-       return  singleThread {
-           val stkVersion = Version()
-           stkVersion.run()
-           (stkVersion.runner as BackgroundCommandRunner).stdout
-       }
+    private fun isInstalled(): Boolean {
+        val stdout = version.runSync().stdout
+        return stdout.contains(STK_VERSION_MESSAGE)
     }
-
     fun isStackfileSelected(): Boolean = stack != null && stackfile != null
 
     fun clearInfo() {

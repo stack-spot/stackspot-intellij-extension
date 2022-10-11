@@ -27,40 +27,48 @@ import com.stackspot.model.cli.CliStackfile
 import com.stackspot.model.cli.CliTemplate
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlin.system.measureTimeMillis
 
-object ImportedStacks {
+class ImportedStacks private constructor(
+    private val stackInfoList: CommandInfoList,
+    private val stackfileInfoList: CommandInfoList,
+    private val templateInfoList: CommandInfoList,
+    private val pluginInfoList: CommandInfoList
+) {
+
+    companion object : SingletonHolder(::ImportedStacks)
 
     init {
-            loadMapsAndLists()
+        refreshCommandInfo()
     }
 
-    lateinit var pluginsPathMap: Map<String, List<CliPlugin>>
-    lateinit var templatesPathMap: Map<String, List<CliTemplate>>
-    lateinit var stackfilesPathMap: Map<String, List<CliStackfile>>
-    lateinit var stacksPathList: List<CliStack>
+    private lateinit var pluginsPathMap: Map<String, List<CliPlugin>>
+    private lateinit var templatesPathMap: Map<String, List<CliTemplate>>
+    private lateinit var stackfilesPathMap: Map<String, List<CliStackfile>>
+    private lateinit var stacksPathList: List<CliStack>
 
-
-    private fun loadMapsAndLists() {
+    private fun refreshCommandInfo() {
         runBlocking {
             launch {
-                stacksPathList = getCommandInfoList(Command.STACK).parseJsonToList()
+                stacksPathList = getCommandInfoList(stackInfoList, Command.STACK).parseJsonToList()
             }
 
             launch {
-                stackfilesPathMap = getCommandInfoList(Command.STACKFILE).parseJsonToMapWithList()
+                stackfilesPathMap =
+                    getCommandInfoList(stackfileInfoList, Command.STACKFILE).parseJsonToMapWithList()
             }
 
             launch {
-                templatesPathMap = getCommandInfoList(Command.TEMPLATE).parseJsonToMapWithList()
+                templatesPathMap = getCommandInfoList(templateInfoList, Command.TEMPLATE).parseJsonToMapWithList()
             }
 
             launch {
-                pluginsPathMap = getCommandInfoList(Command.PLUGIN).parseJsonToMapWithList()
+                pluginsPathMap = getCommandInfoList(pluginInfoList, Command.PLUGIN).parseJsonToMapWithList()
             }
         }
     }
 
-    fun hasStackFiles() = list().any { it.listStackfiles(filterByStack = false).isNotEmpty() }
+    fun hasStackFiles() = list().any { it.listStackfiles().isNotEmpty() }
 
     fun list(): List<Stack> {
         return stacksPathList
@@ -75,11 +83,34 @@ object ImportedStacks {
         return list().firstOrNull { it.name == name }
     }
 
-    private suspend fun getCommandInfoList(command: Command): String {
-        return CommandInfoList(command.value).runAsync().await().stdout
+    private suspend fun getCommandInfoList(commandInfoList: CommandInfoList, command: Command): String {
+        commandInfoList.command = command.value
+        return commandInfoList.runAsync().await().stdout
     }
 
-    fun reload() {
-        loadMapsAndLists()
+    fun refresh() {
+        refreshCommandInfo()
+    }
+}
+
+open class SingletonHolder(
+    var constructor: (CommandInfoList, CommandInfoList, CommandInfoList, CommandInfoList) -> ImportedStacks
+) {
+
+    @Volatile
+    private lateinit var instance: ImportedStacks
+    fun getInstance(
+        stackInfoList: CommandInfoList = CommandInfoList(),
+        stackfileInfoList: CommandInfoList = CommandInfoList(),
+        templateInfoList: CommandInfoList = CommandInfoList(),
+        pluginInfoList: CommandInfoList = CommandInfoList(),
+        newInstance: Boolean = false
+    ): ImportedStacks {
+        synchronized(this) {
+            if (!::instance.isInitialized || newInstance) {
+                instance = constructor(stackInfoList, stackfileInfoList, templateInfoList, pluginInfoList)
+            }
+            return instance
+        }
     }
 }

@@ -17,10 +17,8 @@
 package com.stackspot.intellij.services.enums
 
 enum class Command(val value: String) {
-    ACTION("action"),
     PLUGIN("plugin"),
     STACK("stack"),
     STACKFILE("stackfile"),
-    TASK("task"),
     TEMPLATE("template")
 }

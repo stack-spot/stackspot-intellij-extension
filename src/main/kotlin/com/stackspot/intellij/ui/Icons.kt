@@ -29,6 +29,9 @@ object Icons {
     val APPLY_PLUGIN = IconLoader.getIcon("/images/apply_plugin.svg", javaClass)
 
     @JvmField
+    val UPDATE_STACK = IconLoader.getIcon("/images/update_stack.svg", javaClass)
+
+    @JvmField
     val REFRESH = IconLoader.getIcon("/images/refresh.svg", javaClass)
 
     @JvmField

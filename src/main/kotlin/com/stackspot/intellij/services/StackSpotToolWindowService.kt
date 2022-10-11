@@ -26,7 +26,7 @@ import java.io.File
 
 @Service
 class StackSpotToolWindowService {
-    val importedStacks = ImportedStacks
+    val importedStacks = ImportedStacks.getInstance()
     var project: Project? = null
     var history: History? = null
     var template: AppliedTemplate? = null

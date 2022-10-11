@@ -25,7 +25,7 @@ class NotifyStacksUpdatedCommandListener : CommandRunner.CommandEndedListener {
     override fun notifyEnded() {
         val application = ApplicationManager.getApplication()
         val publisher = application.messageBus.syncPublisher(StackUpdatesNotifier.TOPIC)
-        ImportedStacks.reload()
+        ImportedStacks.getInstance().refresh()
         publisher.stacksUpdated()
     }
 }

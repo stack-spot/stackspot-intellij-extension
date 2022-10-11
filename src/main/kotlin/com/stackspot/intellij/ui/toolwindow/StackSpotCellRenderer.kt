@@ -160,7 +160,7 @@ class StackSpotCellRenderer(val tree: AbstractStackSpotTree) : DefaultTreeCellRe
         tree: JTree?,
         selected: Boolean
     ): JButton {
-        val updateStackButton = createButton("Update Stack", getIcon(Icons.REFRESH, selected, true))
+        val updateStackButton = createButton("Update Stack", getIcon(Icons.UPDATE_STACK, selected, true))
         updateStackButton.addActionListener {
             val project = (tree as AbstractStackSpotTree).service.project
             if (stackSpotNode.stack != null && project != null) {

@@ -18,6 +18,8 @@ package com.stackspot.intellij.services
 
 import com.stackspot.intellij.commands.BackgroundCommandRunner
 import com.stackspot.intellij.commands.git.GitConfig
+import com.stackspot.intellij.commands.stk.CommandInfoList
+import com.stackspot.intellij.commands.stk.Version
 import com.stackspot.intellij.services.enums.ProjectWizardState
 import com.stackspot.model.ImportedStacks
 import com.stackspot.model.Stack
@@ -39,11 +41,25 @@ import java.util.stream.Stream
 internal class CreateProjectServiceTest {
 
     private val gitConfigCmd: GitConfig = mockk(relaxUnitFun = true)
+    private val version: Version = mockk(relaxUnitFun = true)
+    private val stackInfoList: CommandInfoList = mockk(relaxed = true)
+    private val stackfileInfoList: CommandInfoList = mockk(relaxed = true)
+    private val templateInfoList: CommandInfoList = mockk(relaxed = true)
+    private val pluginInfoList: CommandInfoList = mockk(relaxed = true)
 
     @BeforeEach
     fun init() {
         clearAllMocks()
+        stubbing()
+        ImportedStacks.getInstance(stackInfoList, stackfileInfoList, templateInfoList, pluginInfoList)
         mockkObject(ImportedStacks)
+    }
+
+    private fun stubbing() {
+        coEvery { stackInfoList.runAsync().await().stdout } returns "[]"
+        coEvery { stackfileInfoList.runAsync().await().stdout } returns "{}"
+        coEvery { templateInfoList.runAsync().await().stdout } returns "{}"
+        coEvery { pluginInfoList.runAsync().await().stdout } returns "{}"
     }
 
     @Nested
@@ -51,26 +67,30 @@ internal class CreateProjectServiceTest {
 
         @Test
         fun `service state should be STACKFILES_EMPTY`() {
-            every { ImportedStacks.hasStackFiles() } returns false
-            val service = CreateProjectService(isInstalled = true)
+            every { ImportedStacks.getInstance(any(), any(), any(), any()).hasStackFiles() } returns false
+            every { version.runSync().stdout } returns "stk version"
+            val service = CreateProjectService(version = version)
             service.state shouldBe ProjectWizardState.STACKFILES_EMPTY
-            verify { ImportedStacks.hasStackFiles() }
+            verify { ImportedStacks.getInstance(any(), any(), any(), any()).hasStackFiles() }
             confirmVerified(ImportedStacks)
         }
 
         @Test
         fun `service state should be NOT_INSTALLED`() {
-            val service = CreateProjectService(isInstalled = false)
+            every { version.runSync().stdout } returns ""
+            val service = CreateProjectService(version = version)
             service.state shouldBe ProjectWizardState.NOT_INSTALLED
+            verify { version.runSync() }
         }
 
         @Test
         fun `service state should be GIT_CONFIG_NOT_OK`() {
-            every { ImportedStacks.hasStackFiles() } returns true
+            every { ImportedStacks.getInstance(any(), any(), any(), any()).hasStackFiles() } returns true
+            every { version.runSync().stdout } returns "stk version"
             every { (gitConfigCmd.runner as BackgroundCommandRunner).stdout } returns ""
-            val service = CreateProjectService(gitConfigCmd = gitConfigCmd, isInstalled = true)
+            val service = CreateProjectService(gitConfigCmd = gitConfigCmd, version = version)
             service.state shouldBe ProjectWizardState.GIT_CONFIG_NOT_OK
-            verify { ImportedStacks.hasStackFiles() }
+            verify { ImportedStacks.getInstance(any(), any(), any(), any()).hasStackFiles() }
             verify { gitConfigCmd.run() }
             confirmVerified(ImportedStacks)
         }
@@ -110,11 +130,12 @@ internal class CreateProjectServiceTest {
 
         @Test
         fun `service state should be OK`() {
-            every { ImportedStacks.hasStackFiles() } returns true
+            every { ImportedStacks.getInstance(any(), any(), any(), any()).hasStackFiles() } returns true
+            every { version.runSync().stdout } returns "stk version"
             every { (gitConfigCmd.runner as BackgroundCommandRunner).stdout } returns "ok"
-            val service = CreateProjectService(isInstalled = true, gitConfigCmd = gitConfigCmd)
+            val service = CreateProjectService(gitConfigCmd = gitConfigCmd, version = version)
             service.state shouldBe ProjectWizardState.OK
-            verify { ImportedStacks.hasStackFiles() }
+            verify { ImportedStacks.getInstance(any(), any(), any(), any()).hasStackFiles() }
             verify(exactly = 2) { gitConfigCmd.run() }
             confirmVerified(ImportedStacks)
         }
@@ -122,7 +143,7 @@ internal class CreateProjectServiceTest {
         @Test
         fun `should add git config`() {
             every { gitConfigCmd.run() } just runs
-            val service = CreateProjectService(gitConfigCmd = gitConfigCmd, isInstalled = true)
+            val service = CreateProjectService(gitConfigCmd = gitConfigCmd)
             service.addGitConfig("aaa", "b@b.com")
             await.atMost(500, TimeUnit.MILLISECONDS)
                 .untilAsserted {
@@ -189,4 +210,5 @@ internal class CreateProjectServiceTest {
         description: String = "stackfile test description",
         template: String = "test-template"
     ) = Stackfile(type, description, template)
+
 }

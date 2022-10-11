@@ -26,7 +26,7 @@ import com.stackspot.intellij.ui.Icons
 
 private const val UPDATE_ALL_STACKS = "Update All Imported Stacks"
 
-class UpdateAllStacksAction : AnAction(UPDATE_ALL_STACKS, UPDATE_ALL_STACKS, Icons.REFRESH), DumbAware {
+class UpdateAllStacksAction : AnAction(UPDATE_ALL_STACKS, UPDATE_ALL_STACKS, Icons.UPDATE_STACK), DumbAware {
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project
         if (project != null) {

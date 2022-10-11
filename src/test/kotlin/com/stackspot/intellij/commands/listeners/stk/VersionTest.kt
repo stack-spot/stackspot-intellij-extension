@@ -14,12 +14,18 @@
  * limitations under the License.
  */
 
-package com.stackspot.intellij.commands.stk
+package com.stackspot.intellij.commands.listeners.stk
 
-import com.stackspot.intellij.commands.BackgroundCommandRunner
-import com.stackspot.intellij.commands.BaseCommand
+import com.stackspot.intellij.commands.stk.Version
+import io.kotest.matchers.shouldBe
+import org.junit.jupiter.api.Test
 
-class Version: BaseCommand(BackgroundCommandRunner()) {
-    override fun commandLine() =  listOf("stk", "--version")
+class VersionTest {
+
+    @Test
+    fun `it must return the stk version command`() {
+        val version = Version()
+        val commandLine = version.commandLine()
+        commandLine shouldBe listOf("stk", "--version")
+    }
 }
-

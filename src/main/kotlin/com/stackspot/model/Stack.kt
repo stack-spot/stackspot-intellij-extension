@@ -49,28 +49,21 @@ data class Stack(
     fun getTemplateByName(componentName: String): Template? {
         val pathsList = templatesMap.getOrDefault(this.name, listOf())
         return pathsList
-            .filter { it.name == componentName  }
+            .filter { it.name == componentName }
             .map { it.path.parseTemplateYaml(this) }
             .firstOrNull()
     }
 
-    fun getPluginByName(componentName: String?): Plugin {
+    fun getPluginByName(componentName: String?): Plugin? {
         val pluginsList = pluginsMap.getOrDefault(name, listOf())
         return pluginsList
-            .filter{ it.name == componentName }
+            .filter { it.name == componentName }
             .map { it.path.parsePluginYaml(this) }
-            .first()
+            .firstOrNull()
     }
 
-    fun listStackfiles(
-        filterByStack: Boolean = true
-    ): List<Stackfile> {
-        var pathsList = stackfilesMap.values.flatten()
-
-        if (filterByStack) {
-            pathsList = stackfilesMap.getOrDefault(name, listOf())
-        }
-
+    fun listStackfiles(): List<Stackfile> {
+        val pathsList = stackfilesMap.getOrDefault(name, listOf())
         return pathsList.map { it.path.parseStackfile() }
     }
 

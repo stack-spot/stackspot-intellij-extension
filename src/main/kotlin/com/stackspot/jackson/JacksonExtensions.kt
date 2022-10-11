@@ -22,18 +22,13 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.module.kotlin.KotlinFeature
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import com.jayway.jsonpath.JsonPath
 import com.stackspot.constants.Constants
 import com.stackspot.model.*
 import com.stackspot.model.cli.CliPlugin
 import com.stackspot.model.cli.CliStackfile
 import com.stackspot.model.cli.CliTemplate
-import com.stackspot.jackson.JacksonExtensions
 import org.apache.commons.lang3.StringUtils
 import java.io.File
-import java.io.InputStream
-import java.time.Duration
-import java.time.Instant
 
 object JacksonExtensions {
 
@@ -73,18 +68,17 @@ fun <T> File.parseYaml(clazz: Class<T>): T {
     }
 }
 
-fun String.parseJsonToGetPaths(): List<String> {
-    return JsonPath.parse(this).read("$..path")
-}
-
+const val CURLY_BRACKETS = "{}"
 inline fun <reified T> String.parseJsonToMapWithList(): HashMap<String, List<T>> {
+    val content = if (this.contains(CURLY_BRACKETS)) CURLY_BRACKETS else this
     val typeRef: TypeReference<HashMap<String, List<T>>> = object : TypeReference<HashMap<String, List<T>>>() {}
-    return JacksonExtensions.objectMapperJson.readValue(this, typeRef)
+    return JacksonExtensions.objectMapperJson.readValue(content, typeRef)
 }
 
 inline fun <reified T> String.parseJsonToList(): List<T> {
+    val content = if (this.contains(CURLY_BRACKETS)) "[]" else this
     val typeRef: TypeReference<List<T>> = object : TypeReference<List<T>>() {}
-    return JacksonExtensions.objectMapperJson.readValue(this, typeRef)
+    return JacksonExtensions.objectMapperJson.readValue(content, typeRef)
 }
 
 fun String.parsePluginYaml(stack: Stack): Plugin {
@@ -102,21 +96,21 @@ fun String.parseTemplateYaml(stack: Stack): Template {
 }
 
 private const val FILE_NAME_REGEX = "([A-Za-z0-9-_]+(.yaml|.yml))\$"
-private const val REPLACE_FILE_REGEX = "\\/$FILE_NAME_REGEX"
+private const val REPLACE_FILE_REGEX = "l\\/$FILE_NAME_REGEX"
 
 fun String.parseStackYaml(
-    pluginsMap: Map<String, List<CliPlugin>>,
-    templatesMap: Map<String, List<CliTemplate>>,
-    stackfilesMap: Map<String, List<CliStackfile>>
+    pluginsPathMap: Map<String, List<CliPlugin>>,
+    templatesPathMap: Map<String, List<CliTemplate>>,
+    stackfilesPathMap: Map<String, List<CliStackfile>>
 ): Stack {
     val stackYaml = File(this)
     val stack = stackYaml.parseYaml(Stack::class.java)
 
     val pathName = this.replace(REPLACE_FILE_REGEX.toRegex(), StringUtils.EMPTY)
     stack.location = File(pathName)
-    stack.pluginsMap = pluginsMap
-    stack.templatesMap = templatesMap
-    stack.stackfilesMap = stackfilesMap
+    stack.pluginsMap = pluginsPathMap
+    stack.templatesMap = templatesPathMap
+    stack.stackfilesMap = stackfilesPathMap
     return stack
 }
 
@@ -138,16 +132,4 @@ fun String.parseStackfile(): Stackfile {
     }
 
     return stackfile
-}
-
-fun <T> InputStream.yamlToObject(clazz: Class<T>): T =
-    JacksonExtensions.objectMapperYaml.readValue(this, clazz)
-
-object YamlResourceUtils {
-
-    fun <T> readYaml(resourcePath: String, clazz: Class<T>): T? {
-        val resourceAsStream = javaClass.classLoader.getResourceAsStream(resourcePath)
-        return resourceAsStream?.yamlToObject(clazz)
-    }
-
 }

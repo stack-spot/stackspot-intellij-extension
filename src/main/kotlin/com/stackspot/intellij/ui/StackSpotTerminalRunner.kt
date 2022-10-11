@@ -68,6 +68,8 @@ class StackSpotTerminalCommandMonitoringTask(
     }
 }
 
+private const val OPERATION_IS_NOT_SUPPORTED = "Operation is not supported"
+
 class StackSpotTerminalRunner(private val project: Project, private val workingDir: String? = null) : CommandRunner {
 
     companion object {
@@ -86,11 +88,11 @@ class StackSpotTerminalRunner(private val project: Project, private val workingD
     override fun runSync(
         commandLine: List<String>
     ): BackgroundCommandRunner {
-        TODO("Not yet implemented")
+        throw UnsupportedOperationException(OPERATION_IS_NOT_SUPPORTED)
     }
 
     override suspend fun runAsync(commandLine: List<String>): Deferred<BackgroundCommandRunner> {
-        TODO("Not yet implemented")
+        throw UnsupportedOperationException(OPERATION_IS_NOT_SUPPORTED)
     }
 
     private fun resolveWorkingDir() = workingDir ?: project.basePath

@@ -18,11 +18,14 @@ package com.stackspot.intellij.commands.stk
 
 import com.stackspot.intellij.commands.BackgroundCommandRunner
 import com.stackspot.intellij.commands.BaseCommand
+import org.apache.commons.lang3.StringUtils
 
-class CommandInfoList(private val command: String,
-                      workingDir: String? = null,
-                      private val flags: Array<String> = arrayOf(),
+class CommandInfoList(
+    workingDir: String? = null
 ): BaseCommand(BackgroundCommandRunner(workingDir)) {
+
+    var command: String = StringUtils.EMPTY
+    var flags: Array<String> = arrayOf()
 
     override fun commandLine() =  listOf("stk", "list", command, "--json", *flags)
 }
