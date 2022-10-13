@@ -17,9 +17,12 @@
 package com.stackspot.model
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.stackspot.yaml.parsePluginYaml
-import com.stackspot.yaml.parseStackfile
-import com.stackspot.yaml.parseTemplateYaml
+import com.stackspot.jackson.parsePluginYaml
+import com.stackspot.jackson.parseStackfile
+import com.stackspot.jackson.parseTemplateYaml
+import com.stackspot.model.cli.CliPlugin
+import com.stackspot.model.cli.CliStackfile
+import com.stackspot.model.cli.CliTemplate
 import java.io.File
 import java.util.*
 
@@ -29,72 +32,46 @@ data class Stack(
     val displayName: String? = null,
     @JsonProperty("display-name") val displayNameKebab: String? = null,
     val useCases: List<StackUseCase>? = null,
-    @JsonProperty("use-cases") val useCasesKebab: List<StackUseCase>? = null
+    @JsonProperty("use-cases") val useCasesKebab: List<StackUseCase>? = null,
 ) {
     lateinit var location: File
-
-    fun filterTemplatesByType(type: TemplateType): List<Template> {
-        return location.walk().filter {
-            it.isDirectory && isTemplateOfType(it, type.templateType)
-        }.mapNotNull {
-            it.parseTemplateYaml(this)
-        }.toList()
-    }
+    lateinit var pluginsMap: Map<String, List<CliPlugin>>
+    lateinit var templatesMap: Map<String, List<CliTemplate>>
+    lateinit var stackfilesMap: Map<String, List<CliStackfile>>
 
     fun filterPluginsByType(type: TemplateType): List<Plugin> {
-        return location.walk().filter {
-            it.isDirectory && isTemplateOfType(it, type.pluginType)
-        }.mapNotNull {
-            it.parsePluginYaml(this)
-        }.toList()
+        val pluginsList = pluginsMap.getOrDefault(name, listOf())
+        return pluginsList
+            .filter { isTemplateOfType(it, type.pluginType) }
+            .map { it.path.parsePluginYaml(this) }
     }
 
-    fun getTemplateByName(name: String): Template? {
-        return location.walk().filter {
-            it.isDirectory && name.equals(it.name, true)
-        }.mapNotNull {
-            it.parseTemplateYaml(this)
-        }.firstOrNull()
+    fun getTemplateByName(componentName: String): Template? {
+        val pathsList = templatesMap.getOrDefault(this.name, listOf())
+        return pathsList
+            .filter { it.name == componentName }
+            .map { it.path.parseTemplateYaml(this) }
+            .firstOrNull()
     }
 
-    fun getPluginByName(name: String): Plugin? {
-        return location.walk().filter {
-            it.isDirectory && name.equals(it.name, true)
-        }.mapNotNull {
-            it.parsePluginYaml(this)
-        }.firstOrNull()
-    }
-
-    fun listCompatiblePluginsByStackType(stackType: String): List<Plugin> {
-        val templateType = if (stackType == "env") {
-            TemplateType.ENV
-        } else {
-            TemplateType.APP
-        }
-        return filterPluginsByType(templateType)
+    fun getPluginByName(componentName: String?): Plugin? {
+        val pluginsList = pluginsMap.getOrDefault(name, listOf())
+        return pluginsList
+            .filter { it.name == componentName }
+            .map { it.path.parsePluginYaml(this) }
+            .firstOrNull()
     }
 
     fun listStackfiles(): List<Stackfile> {
-        return location.toPath().resolve("stackfiles").toFile()
-            .walk()
-            .filter { it.name.endsWith(".yaml") }
-            .map { it.parseStackfile() }
-            .toList()
+        val pathsList = stackfilesMap.getOrDefault(name, listOf())
+        return pathsList.map { it.path.parseStackfile() }
     }
 
     fun listPlugins(): List<Plugin> {
-        return location.walk().filter {
-            it.isDirectory
-        }.filter {
-            val template = it.parseTemplateYaml(this)
-            template != null && (template.types.contains(TemplateType.APP.pluginType))
-        }.mapNotNull {
-            it.parsePluginYaml(this)
-        }.toList()
+        return filterPluginsByType(TemplateType.APP)
     }
 
-    private fun isTemplateOfType(dir: File, templateType: String): Boolean {
-        val template = dir.parseTemplateYaml(this) ?: return false
+    private fun isTemplateOfType(template: CliTemplate, templateType: String): Boolean {
         return template.types.contains(templateType)
     }
 

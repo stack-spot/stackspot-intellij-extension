@@ -27,7 +27,9 @@ import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.ui.content.ContentManager
 import com.jediterm.terminal.model.TerminalModelListener
 import com.stackspot.constants.Constants
+import com.stackspot.intellij.commands.BackgroundCommandRunner
 import com.stackspot.intellij.commands.CommandRunner
+import kotlinx.coroutines.Deferred
 import org.jetbrains.plugins.terminal.ShellTerminalWidget
 import org.jetbrains.plugins.terminal.TerminalTabState
 import org.jetbrains.plugins.terminal.TerminalToolWindowFactory
@@ -66,6 +68,8 @@ class StackSpotTerminalCommandMonitoringTask(
     }
 }
 
+private const val OPERATION_IS_NOT_SUPPORTED = "Operation is not supported"
+
 class StackSpotTerminalRunner(private val project: Project, private val workingDir: String? = null) : CommandRunner {
 
     companion object {
@@ -79,6 +83,16 @@ class StackSpotTerminalRunner(private val project: Project, private val workingD
         if (window != null) {
             executeCommandInTerminal(window, listener, commandLine)
         }
+    }
+
+    override fun runSync(
+        commandLine: List<String>
+    ): BackgroundCommandRunner {
+        throw UnsupportedOperationException(OPERATION_IS_NOT_SUPPORTED)
+    }
+
+    override suspend fun runAsync(commandLine: List<String>): Deferred<BackgroundCommandRunner> {
+        throw UnsupportedOperationException(OPERATION_IS_NOT_SUPPORTED)
     }
 
     private fun resolveWorkingDir() = workingDir ?: project.basePath

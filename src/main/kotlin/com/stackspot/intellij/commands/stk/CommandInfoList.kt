@@ -14,24 +14,19 @@
  * limitations under the License.
  */
 
-package com.stackspot.intellij.commands
+package com.stackspot.intellij.commands.stk
 
-import kotlinx.coroutines.Deferred
+import com.stackspot.intellij.commands.BackgroundCommandRunner
+import com.stackspot.intellij.commands.BaseCommand
+import org.apache.commons.lang3.StringUtils
 
+class CommandInfoList(
+    workingDir: String? = null
+): BaseCommand(BackgroundCommandRunner(workingDir)) {
 
-interface CommandRunner {
+    var command: String = StringUtils.EMPTY
+    var flags: Array<String> = arrayOf()
 
-    companion object {
-        val STK_CHANNEL_ENVIRONMENT_VARIABLE = "STK_CHANNEL"
-        val STK_CHANNLE_INTELLIJ = "intellij"
-    }
-
-    interface CommandEndedListener {
-        fun notifyEnded()
-    }
-
-    fun run(commandLine: List<String>, listener: CommandEndedListener? = null)
-
-    fun runSync(commandLine: List<String>): BackgroundCommandRunner
-    suspend fun runAsync(commandLine: List<String>): Deferred<BackgroundCommandRunner>
+    override fun commandLine() =  listOf("stk", "list", command, "--json", *flags)
 }
+

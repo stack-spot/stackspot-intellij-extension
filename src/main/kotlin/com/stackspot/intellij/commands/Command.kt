@@ -16,6 +16,13 @@
 
 package com.stackspot.intellij.commands
 
+import kotlinx.coroutines.Deferred
+
 interface Command {
     fun run(listener: CommandRunner.CommandEndedListener? = null)
+
+    fun runSync(): BackgroundCommandRunner
+
+    suspend fun runAsync(): Deferred<BackgroundCommandRunner>
+
 }

@@ -14,24 +14,18 @@
  * limitations under the License.
  */
 
-package com.stackspot.intellij.commands
+package com.stackspot.intellij.commands.listeners.stk
 
-import kotlinx.coroutines.Deferred
+import com.stackspot.intellij.commands.stk.Version
+import io.kotest.matchers.shouldBe
+import org.junit.jupiter.api.Test
 
+class VersionTest {
 
-interface CommandRunner {
-
-    companion object {
-        val STK_CHANNEL_ENVIRONMENT_VARIABLE = "STK_CHANNEL"
-        val STK_CHANNLE_INTELLIJ = "intellij"
+    @Test
+    fun `it must return the stk version command`() {
+        val version = Version()
+        val commandLine = version.commandLine()
+        commandLine shouldBe listOf("stk", "--version")
     }
-
-    interface CommandEndedListener {
-        fun notifyEnded()
-    }
-
-    fun run(commandLine: List<String>, listener: CommandEndedListener? = null)
-
-    fun runSync(commandLine: List<String>): BackgroundCommandRunner
-    suspend fun runAsync(commandLine: List<String>): Deferred<BackgroundCommandRunner>
 }

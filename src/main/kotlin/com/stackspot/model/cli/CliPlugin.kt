@@ -14,24 +14,11 @@
  * limitations under the License.
  */
 
-package com.stackspot.intellij.commands
+package com.stackspot.model.cli
 
-import kotlinx.coroutines.Deferred
-
-
-interface CommandRunner {
-
-    companion object {
-        val STK_CHANNEL_ENVIRONMENT_VARIABLE = "STK_CHANNEL"
-        val STK_CHANNLE_INTELLIJ = "intellij"
-    }
-
-    interface CommandEndedListener {
-        fun notifyEnded()
-    }
-
-    fun run(commandLine: List<String>, listener: CommandEndedListener? = null)
-
-    fun runSync(commandLine: List<String>): BackgroundCommandRunner
-    suspend fun runAsync(commandLine: List<String>): Deferred<BackgroundCommandRunner>
-}
+class CliPlugin(
+    override val description: String,
+    override val name: String,
+    override val path: String,
+    override val types: List<String>
+): CliTemplate(description, name, path, types)

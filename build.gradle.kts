@@ -33,6 +33,7 @@ dependencies {
     testImplementation("io.mockk:mockk:1.13.1")
     testImplementation("io.kotest:kotest-assertions-core:5.4.2")
     testImplementation("org.awaitility:awaitility-kotlin:4.2.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
 }
 
 kotlin {

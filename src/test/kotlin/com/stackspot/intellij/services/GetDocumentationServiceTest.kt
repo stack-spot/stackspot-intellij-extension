@@ -19,15 +19,11 @@ package com.stackspot.intellij.services
 import com.stackspot.intellij.commands.git.GitBranch
 import com.stackspot.intellij.commands.git.GitConfig
 import com.stackspot.model.Stack
-import com.stackspot.yaml.YamlResourceUtils
 import io.kotest.matchers.shouldBe
-import io.mockk.*
+import io.mockk.mockk
 import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.NullSource
-import java.io.File
-import kotlin.io.path.Path
 
 internal class GetDocumentationServiceTest {
 

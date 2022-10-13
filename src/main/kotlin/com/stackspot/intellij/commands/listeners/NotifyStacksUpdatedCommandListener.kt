@@ -19,11 +19,13 @@ package com.stackspot.intellij.commands.listeners
 import com.intellij.openapi.application.ApplicationManager
 import com.stackspot.intellij.commands.CommandRunner
 import com.stackspot.intellij.messaging.StackUpdatesNotifier
+import com.stackspot.model.ImportedStacks
 
 class NotifyStacksUpdatedCommandListener : CommandRunner.CommandEndedListener {
     override fun notifyEnded() {
         val application = ApplicationManager.getApplication()
         val publisher = application.messageBus.syncPublisher(StackUpdatesNotifier.TOPIC)
+        ImportedStacks.getInstance().refresh()
         publisher.stacksUpdated()
     }
 }

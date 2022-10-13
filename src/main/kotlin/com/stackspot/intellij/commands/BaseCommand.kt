@@ -16,7 +16,11 @@
 
 package com.stackspot.intellij.commands
 
+import kotlinx.coroutines.Deferred
+
 abstract class BaseCommand(val runner: CommandRunner) : Command {
     abstract fun commandLine(): List<String>
     override fun run(listener: CommandRunner.CommandEndedListener?) = runner.run(commandLine(), listener)
+    override fun runSync(): BackgroundCommandRunner = runner.runSync(commandLine())
+    override suspend fun runAsync(): Deferred<BackgroundCommandRunner> = runner.runAsync(commandLine())
 }

@@ -20,17 +20,22 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.project.DumbAware
 import com.stackspot.intellij.commands.listeners.NotifyStacksUpdatedCommandListener
-import com.stackspot.intellij.commands.stk.UpdateAllStacks
 import com.stackspot.intellij.ui.Icons
 
 
-private const val UPDATE_ALL_STACKS = "Update All Imported Stacks"
+private const val REFRESH = "Refresh"
 
-class UpdateAllStacksAction : AnAction(UPDATE_ALL_STACKS, UPDATE_ALL_STACKS, Icons.UPDATE_STACK), DumbAware {
+class RefreshAction() : AnAction(REFRESH, REFRESH, Icons.REFRESH), DumbAware {
+
+    private var listener: NotifyStacksUpdatedCommandListener = NotifyStacksUpdatedCommandListener()
+
+    constructor(listener: NotifyStacksUpdatedCommandListener): this() {
+        this.listener = listener
+    }
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project
         if (project != null) {
-            UpdateAllStacks(project).run(NotifyStacksUpdatedCommandListener())
+            listener.notifyEnded()
         }
     }
 }

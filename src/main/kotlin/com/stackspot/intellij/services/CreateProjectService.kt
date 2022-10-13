@@ -17,16 +17,18 @@
 package com.stackspot.intellij.services
 
 import com.intellij.openapi.components.Service
-import com.intellij.util.io.exists
 import com.stackspot.constants.Constants
 import com.stackspot.intellij.commands.BackgroundCommandRunner
 import com.stackspot.intellij.commands.git.GitConfig
+import com.stackspot.intellij.commands.stk.Version
 import com.stackspot.intellij.services.enums.ProjectWizardState
 import com.stackspot.model.ImportedStacks
 import com.stackspot.model.Stack
 import com.stackspot.model.Stackfile
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+
+private const val STK_VERSION_MESSAGE = "stk version"
 
 @Service
 class CreateProjectService() {
@@ -35,9 +37,9 @@ class CreateProjectService() {
     var stackfile: Stackfile? = null
     val state: ProjectWizardState
         get() {
-            return if (!isInstalled) {
+            return if (!isInstalled()) {
                 ProjectWizardState.NOT_INSTALLED
-            } else if (!importedStacks.hasStackFiles()) {
+            } else if (!ImportedStacks.getInstance().hasStackFiles()) {
                 ProjectWizardState.STACKFILES_EMPTY
             } else if (!isGitConfigOk()) {
                 ProjectWizardState.GIT_CONFIG_NOT_OK
@@ -45,20 +47,22 @@ class CreateProjectService() {
                 ProjectWizardState.OK
             }
         }
-    private var isInstalled = Constants.Paths.STK_BIN.exists()
-    private var importedStacks = ImportedStacks()
+
+    private var version = Version()
     private var gitConfigCmd = GitConfig(Constants.Paths.STK_HOME.toString())
 
     constructor(
-        importedStacks: ImportedStacks = ImportedStacks(),
-        isInstalled: Boolean = Constants.Paths.STK_BIN.exists(),
+        version: Version = Version(),
         gitConfigCmd: GitConfig = GitConfig(Constants.Paths.STK_HOME.toString())
     ) : this() {
-        this.importedStacks = importedStacks
-        this.isInstalled = isInstalled
+        this.version = version
         this.gitConfigCmd = gitConfigCmd
     }
 
+    private fun isInstalled(): Boolean {
+        val stdout = version.runSync().stdout
+        return stdout.contains(STK_VERSION_MESSAGE)
+    }
     fun isStackfileSelected(): Boolean = stack != null && stackfile != null
 
     fun clearInfo() {

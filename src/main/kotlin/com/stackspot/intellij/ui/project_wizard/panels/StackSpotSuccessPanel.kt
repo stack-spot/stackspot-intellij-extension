@@ -35,7 +35,7 @@ class StackSpotSuccessPanel(private val parentPanel: StackSpotParentPanel) {
     private lateinit var stackDescriptionLabel: Cell<JEditorPane>
     private lateinit var linkPlaceholder: Placeholder
 
-    private val importedStacks: List<Stack> = ImportedStacks().list().sortedBy { it.name }
+    private val importedStacks: List<Stack> = ImportedStacks.getInstance().list()
     private val stackfilesByStack: List<Pair<Stack, List<Stackfile>>> =
         importedStacks.map { stack ->
             val stackfiles = stack.listStackfiles().sortedBy { it.name }

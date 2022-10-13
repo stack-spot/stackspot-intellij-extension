@@ -18,13 +18,16 @@ package com.stackspot.intellij.commands
 
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.util.ExecUtil.execAndGetOutput
+import com.stackspot.intellij.commons.singleThread
+import com.stackspot.intellij.commons.singleThreadAsCoroutine
+import kotlinx.coroutines.Deferred
 import java.nio.charset.Charset
 
-class BackgroundCommandRunner(private var workingDir: String) : CommandRunner {
+class BackgroundCommandRunner(private var workingDir: String? = null) : CommandRunner {
 
     var stdout: String = ""
         get() {
-            return field.replace("\\n".toRegex(), "")
+            return replaceStdout(field)
         }
     lateinit var stderr: String
     var exitCode: Int = 0
@@ -43,5 +46,40 @@ class BackgroundCommandRunner(private var workingDir: String) : CommandRunner {
         timeout = processOutput.isTimeout
         cancelled = processOutput.isCancelled
         listener?.notifyEnded()
+    }
+
+    private fun replaceStdout(stdout: String) =
+        stdout.replace("\\n".toRegex(), "")
+
+    override fun runSync(
+        commandLine: List<String>
+    ): BackgroundCommandRunner {
+        return singleThread {
+            var done = false
+            this.run(commandLine, object : CommandRunner.CommandEndedListener {
+                override fun notifyEnded() {
+                    done = true
+                }
+            })
+
+            while (!done) {
+                Thread.sleep(1L)
+            }
+            this
+        }
+    }
+
+    override suspend fun runAsync(
+        commandLine: List<String>
+    ): Deferred<BackgroundCommandRunner> {
+        var done = false
+        return singleThreadAsCoroutine {
+            this.run(commandLine, object : CommandRunner.CommandEndedListener {
+                override fun notifyEnded() {
+                    done = true
+                }
+            })
+            this
+        }
     }
 }
