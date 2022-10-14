@@ -25,4 +25,5 @@ class Plugin(
     override val inputs: List<Input>?,
     override val displayName: String?,
     @JsonProperty("display-name") override val displayNameKebab: String?,
+    val requirements: List<String>? = listOf(),
 ) : Template(name, description, types, inputs, displayName, displayNameKebab)

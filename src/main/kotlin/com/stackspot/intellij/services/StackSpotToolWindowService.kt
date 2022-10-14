@@ -30,7 +30,7 @@ class StackSpotToolWindowService {
     var project: Project? = null
     var history: History? = null
     var template: AppliedTemplate? = null
-    var appliedPlugins: List<AppliedTemplate> = ArrayList<AppliedTemplate>(0)
+    var appliedPlugins: List<AppliedTemplate> = ArrayList(0)
 
     fun reloadProjectData() {
         val p = project
@@ -57,5 +57,11 @@ class StackSpotToolWindowService {
             template = appliedTemplates.first()
             appliedPlugins = appliedTemplates.subList(1, appliedTemplates.size)
         }
+    }
+
+    fun pluginsOrTemplatesNotApplied(plugins: List<String>? = null): List<String> {
+        return plugins
+            ?.filter { p -> appliedPlugins.none { ap -> ap.templateDataPath == p } && p != template?.templateDataPath }
+            ?.toList() ?: listOf()
     }
 }

@@ -16,7 +16,16 @@
 
 package com.stackspot.model
 
-data class Input(val type: String, val label: String, val name: String, val default: Any?, val condition: Condition?) {
+data class Input(
+    val type: String,
+    val label: String,
+    val name: String,
+    val default: Any?,
+    val condition: Condition?,
+    val required: Boolean = false,
+    val items: Set<String>? = mutableSetOf(),
+    val pattern: String? = null,
+    val help: String? = null) {
 
     fun convert(value: String): Comparable<*> {
         return when (type) {

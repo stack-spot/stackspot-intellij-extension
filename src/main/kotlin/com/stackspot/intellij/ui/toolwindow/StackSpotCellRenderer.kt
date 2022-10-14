@@ -16,6 +16,7 @@
 
 package com.stackspot.intellij.ui.toolwindow
 
+import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.IconLoader
 import com.intellij.ui.ColorUtil
 import com.intellij.util.ui.UIUtil
@@ -25,12 +26,12 @@ import com.stackspot.intellij.commands.stk.ApplyPlugin
 import com.stackspot.intellij.commands.stk.DeleteStack
 import com.stackspot.intellij.commands.stk.UpdateStack
 import com.stackspot.intellij.ui.Icons
-import java.awt.BorderLayout
-import java.awt.Color
-import java.awt.Component
-import java.awt.Dimension
+import java.awt.*
 import javax.swing.*
 import javax.swing.tree.DefaultTreeCellRenderer
+
+private const val COULD_NOT_APPLY_PLUGIN = "Could not apply plugin"
+private const val PLUGIN_HAS_DEPENDENCY = "This plugin has dependencies. First, apply these before proceeding:"
 
 class StackSpotCellRenderer(val tree: AbstractStackSpotTree) : DefaultTreeCellRenderer() {
 
@@ -109,15 +110,17 @@ class StackSpotCellRenderer(val tree: AbstractStackSpotTree) : DefaultTreeCellRe
             val stackSpotTree = (tree as AbstractStackSpotTree)
             val project = stackSpotTree.service.project
             if (stackSpotNode.stack != null && stackSpotNode.plugin != null && project != null) {
-                ApplyPlugin(
-                    stackSpotNode.stack,
-                    stackSpotNode.plugin,
-                    project,
-                ).run(object : CommandRunner.CommandEndedListener {
-                    override fun notifyEnded() {
-                        stackSpotTree.notifyChange()
-                    }
-                })
+                if (stackSpotNode.isItPluginDependent()) {
+                    val requirements = stackSpotNode.pluginsNotAppliedToString()
+                    Messages.showWarningDialog("$PLUGIN_HAS_DEPENDENCY\n$requirements", COULD_NOT_APPLY_PLUGIN)
+                } else {
+                    ApplyPlugin(stackSpotNode.stack, stackSpotNode.plugin, project)
+                        .run(object : CommandRunner.CommandEndedListener {
+                            override fun notifyEnded() {
+                                stackSpotTree.notifyChange()
+                            }
+                        })
+                }
             }
         }
         return button
@@ -141,7 +144,13 @@ class StackSpotCellRenderer(val tree: AbstractStackSpotTree) : DefaultTreeCellRe
     private fun createIcon(stackSpotNode: StackSpotTreeNode, selected: Boolean, focused: Boolean) {
         if (stackSpotNode.icon != null) {
             val icon = getIcon(stackSpotNode.icon, selected, focused)
-            panel.add(JLabel(icon), BorderLayout.WEST)
+            val jLabel = JLabel(icon)
+            if (stackSpotNode.plugin != null && stackSpotNode.isItPluginDependent()) {
+                jLabel.toolTipText =
+                    "This plugin has dependencies. First, apply these before proceeding: <br>" +
+                            "${stackSpotNode.pluginsNotAppliedToString(isHtml = true)}"
+            }
+            panel.add(jLabel, BorderLayout.WEST)
         }
     }
 
