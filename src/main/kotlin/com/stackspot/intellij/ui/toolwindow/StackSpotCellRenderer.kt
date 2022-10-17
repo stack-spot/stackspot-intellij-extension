@@ -120,16 +120,17 @@ class StackSpotCellRenderer(val tree: AbstractStackSpotTree) : DefaultTreeCellRe
             val project = stackSpotTree.service.project
 
             if (stackSpotNode.stack != null && stackSpotNode.plugin != null && project != null) {
-                val applyPluginCmd = ApplyPlugin(stackSpotNode.stack, stackSpotNode.plugin, project)
+
                 if (stackSpotNode.plugin.inputs != null) {
                     val pluginInputPanel = PluginInputsPanel(stackSpotNode.plugin.inputs, project)
                     val isOkExit = pluginInputPanel.showAndGet()
                     if (isOkExit) {
-                        pluginInputPanel.variablesMap
+                        
+                        val applyPluginCmd = ApplyPlugin(stackSpotNode.stack, stackSpotNode.plugin, project, arrayOf())
                         applyPluginCmd.run(NotifyStackSpotToolWindow(tree))
                     }
                 } else {
-                    applyPluginCmd.run(NotifyStackSpotToolWindow(tree))
+                    ApplyPlugin(stackSpotNode.stack, stackSpotNode.plugin, project).run(NotifyStackSpotToolWindow(tree))
                 }
             }
         }

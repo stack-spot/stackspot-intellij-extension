@@ -30,5 +30,5 @@ class ApplyPlugin(
 
     var inputFlags: Array<String> = arrayOf()
 
-    override fun commandLine() = listOf("stk", "apply", "plugin", "${stack.name}/${plugin.name}")
+    override fun commandLine() = listOf("stk", "apply", "plugin", "${stack.name}/${plugin.name}", *inputFlags)
 }

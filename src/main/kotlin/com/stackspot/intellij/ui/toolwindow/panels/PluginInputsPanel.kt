@@ -45,30 +45,28 @@ class PluginInputsPanel(
     private fun draw(input: Input, panel: Panel): Row {
         return when (input.type) {
             "bool" -> panel.row {
-                bla(checkBox(input.label), input.name)
                 checkBox(input.label)
-                    .bindSelected({ input.default as Boolean }, {})
+                    .bindSelected({ input.default as Boolean }, { variablesMap[input.name] = it })
             }
             "int" -> panel.row(input.label) {
                 intTextField()
-                    .text(input.default.toString())
+                    .bindText({ input.default.toString() }, { variablesMap[input.name] = it })
                     .comment(input.help)
 
             }
             "multiselect" -> panel.row(input.label) {
-                input.items?.forEach { checkBox(it) }
+                input.items?.forEach { item ->
+                    checkBox(item)
+                        .bindSelected({ input.default as Boolean }, { variablesMap[input.name] = it })
+                    TODO("Needs to add the new value instead of overwrite it")
+                }
             }
             else -> panel.row(input.label) {
                 input.items?.let { comboBox(it).comment(input.help) }
                     ?: textField()
-                        .text(input.default.toString())
+                        .bindText({ input.default.toString() }, { variablesMap[input.name] = it })
                         .comment(input.help)
             }
         }
     }
-
-    private fun <T : JComponent> bla(value: Cell<T>, key: String) {
-        variablesMap[key] = value.component
-    }
-
 }
