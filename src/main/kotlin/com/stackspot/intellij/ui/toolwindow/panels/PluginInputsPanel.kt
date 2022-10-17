@@ -22,12 +22,17 @@ import com.intellij.ui.dsl.builder.*
 import com.stackspot.model.Input
 import javax.swing.JComponent
 
-class PluginInputsPanel(private val inputs: List<Input>, project: Project? = null) : DialogWrapper(project, true) {
+class PluginInputsPanel(
+    private val inputs: List<Input>,
+    project: Project? = null
+) : DialogWrapper(project, true) {
 
     init {
         title = "Plugin Inputs"
         init()
     }
+
+    val variablesMap = mutableMapOf<String, Any>()
 
     override fun createCenterPanel(): JComponent {
         return panel {
@@ -40,8 +45,9 @@ class PluginInputsPanel(private val inputs: List<Input>, project: Project? = nul
     private fun draw(input: Input, panel: Panel): Row {
         return when (input.type) {
             "bool" -> panel.row {
+                bla(checkBox(input.label), input.name)
                 checkBox(input.label)
-                    .bindSelected({input.default as Boolean}, {})
+                    .bindSelected({ input.default as Boolean }, {})
             }
             "int" -> panel.row(input.label) {
                 intTextField()
@@ -60,4 +66,9 @@ class PluginInputsPanel(private val inputs: List<Input>, project: Project? = nul
             }
         }
     }
+
+    private fun <T : JComponent> bla(value: Cell<T>, key: String) {
+        variablesMap[key] = value.component
+    }
+
 }

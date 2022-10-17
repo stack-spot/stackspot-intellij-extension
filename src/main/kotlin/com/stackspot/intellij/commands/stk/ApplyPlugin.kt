@@ -28,5 +28,7 @@ class ApplyPlugin(
     project: Project
 ) : BaseCommand(StackSpotTerminalRunner(project)) {
 
+    var inputFlags: Array<String> = arrayOf()
+
     override fun commandLine() = listOf("stk", "apply", "plugin", "${stack.name}/${plugin.name}")
 }
