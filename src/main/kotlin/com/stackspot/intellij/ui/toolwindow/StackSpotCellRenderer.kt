@@ -111,7 +111,7 @@ class StackSpotCellRenderer(val tree: AbstractStackSpotTree) : DefaultTreeCellRe
     ): JButton {
         val button = createButton("Apply Plugin", getIcon(Icons.APPLY_PLUGIN, selected, true))
         button.addActionListener {
-            if (stackSpotNode.hasDependent()) {
+            if (stackSpotNode.hasPluginDependency()) {
                 val requirements = stackSpotNode.pluginsNotAppliedToString()
                 Messages.showWarningDialog("$PLUGIN_HAS_DEPENDENCY\n$requirements", COULD_NOT_APPLY_PLUGIN)
             }
@@ -151,7 +151,7 @@ class StackSpotCellRenderer(val tree: AbstractStackSpotTree) : DefaultTreeCellRe
         if (stackSpotNode.icon != null) {
             val icon = getIcon(stackSpotNode.icon, selected, focused)
             val jLabel = JLabel(icon)
-            if (stackSpotNode.plugin != null && stackSpotNode.hasDependent()) {
+            if (stackSpotNode.plugin != null && stackSpotNode.hasPluginDependency()) {
                 jLabel.toolTipText =
                     "This plugin has dependencies. First, apply these before proceeding: <br>" +
                             "${stackSpotNode.pluginsNotAppliedToString(isHtml = true)}"

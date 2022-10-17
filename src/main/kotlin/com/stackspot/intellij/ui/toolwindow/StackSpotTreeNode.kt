@@ -29,7 +29,7 @@ open class StackSpotTreeNode(
     private val pluginsNotApplied: List<String>? = null
 ) : DefaultMutableTreeNode(userObject) {
 
-    fun hasDependent(): Boolean {
+    fun hasPluginDependency(): Boolean {
         return pluginsNotApplied?.isNotEmpty() ?: false
     }
 
