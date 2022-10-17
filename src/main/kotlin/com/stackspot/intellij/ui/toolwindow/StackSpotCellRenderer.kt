@@ -26,6 +26,9 @@ import com.stackspot.intellij.commands.stk.ApplyPlugin
 import com.stackspot.intellij.commands.stk.DeleteStack
 import com.stackspot.intellij.commands.stk.UpdateStack
 import com.stackspot.intellij.ui.Icons
+import com.stackspot.intellij.ui.toolwindow.panels.PluginInputsPanel
+import com.stackspot.model.Condition
+import com.stackspot.model.Input
 import java.awt.*
 import javax.swing.*
 import javax.swing.tree.DefaultTreeCellRenderer
@@ -114,6 +117,9 @@ class StackSpotCellRenderer(val tree: AbstractStackSpotTree) : DefaultTreeCellRe
                     val requirements = stackSpotNode.pluginsNotAppliedToString()
                     Messages.showWarningDialog("$PLUGIN_HAS_DEPENDENCY\n$requirements", COULD_NOT_APPLY_PLUGIN)
                 } else {
+                    if (stackSpotNode.plugin.inputs != null) {
+                        PluginInputsPanel(stackSpotNode.plugin.inputs).showAndGet()
+                    }
                     ApplyPlugin(stackSpotNode.stack, stackSpotNode.plugin, project)
                         .run(object : CommandRunner.CommandEndedListener {
                             override fun notifyEnded() {
