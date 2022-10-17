@@ -16,12 +16,16 @@ package com.stackspot.intellij.ui.toolwindow.panels
  * limitations under the License.
  */
 
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
-import com.intellij.ui.dsl.builder.*
+import com.intellij.ui.dsl.builder.Panel
+import com.intellij.ui.dsl.builder.Row
+import com.intellij.ui.dsl.builder.panel
+import com.intellij.ui.dsl.builder.text
 import com.stackspot.model.Input
 import javax.swing.JComponent
 
-class PluginInputsPanel(private val inputs: List<Input>) : DialogWrapper(true) {
+class PluginInputsPanel(private val inputs: List<Input>, project: Project? = null) : DialogWrapper(project, true) {
 
     init {
         title = "Plugin Inputs"
@@ -38,13 +42,23 @@ class PluginInputsPanel(private val inputs: List<Input>) : DialogWrapper(true) {
 
     private fun draw(input: Input, panel: Panel): Row {
         return when (input.type) {
-            "bool" -> panel.row { checkBox(input.label) }
-            "int" -> panel.row(input.label) { intTextField().text(input.default.toString()) }
+            "bool" -> panel.row {
+                checkBox(input.label)
+            }
+            "int" -> panel.row(input.label) {
+                intTextField()
+                    .text(input.default.toString())
+                    .comment(input.help)
+
+            }
             "multiselect" -> panel.row(input.label) {
                 input.items?.forEach { checkBox(it) }
             }
             else -> panel.row(input.label) {
-                input.items?.let { comboBox(it) } ?: textField().text(input.default.toString())
+                input.items?.let { comboBox(it).comment(input.help) }
+                    ?: textField()
+                        .text(input.default.toString())
+                        .comment(input.help)
             }
         }
     }

@@ -20,16 +20,17 @@ import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.IconLoader
 import com.intellij.ui.ColorUtil
 import com.intellij.util.ui.UIUtil
-import com.stackspot.intellij.commands.CommandRunner
+import com.stackspot.intellij.commands.listeners.NotifyStackSpotToolWindow
 import com.stackspot.intellij.commands.listeners.NotifyStacksUpdatedCommandListener
 import com.stackspot.intellij.commands.stk.ApplyPlugin
 import com.stackspot.intellij.commands.stk.DeleteStack
 import com.stackspot.intellij.commands.stk.UpdateStack
 import com.stackspot.intellij.ui.Icons
 import com.stackspot.intellij.ui.toolwindow.panels.PluginInputsPanel
-import com.stackspot.model.Condition
-import com.stackspot.model.Input
-import java.awt.*
+import java.awt.BorderLayout
+import java.awt.Color
+import java.awt.Component
+import java.awt.Dimension
 import javax.swing.*
 import javax.swing.tree.DefaultTreeCellRenderer
 
@@ -110,22 +111,23 @@ class StackSpotCellRenderer(val tree: AbstractStackSpotTree) : DefaultTreeCellRe
     ): JButton {
         val button = createButton("Apply Plugin", getIcon(Icons.APPLY_PLUGIN, selected, true))
         button.addActionListener {
+            if (stackSpotNode.hasDependent()) {
+                val requirements = stackSpotNode.pluginsNotAppliedToString()
+                Messages.showWarningDialog("$PLUGIN_HAS_DEPENDENCY\n$requirements", COULD_NOT_APPLY_PLUGIN)
+            }
+
             val stackSpotTree = (tree as AbstractStackSpotTree)
             val project = stackSpotTree.service.project
+
             if (stackSpotNode.stack != null && stackSpotNode.plugin != null && project != null) {
-                if (stackSpotNode.isItPluginDependent()) {
-                    val requirements = stackSpotNode.pluginsNotAppliedToString()
-                    Messages.showWarningDialog("$PLUGIN_HAS_DEPENDENCY\n$requirements", COULD_NOT_APPLY_PLUGIN)
-                } else {
-                    if (stackSpotNode.plugin.inputs != null) {
-                        PluginInputsPanel(stackSpotNode.plugin.inputs).showAndGet()
+                val applyPluginCmd = ApplyPlugin(stackSpotNode.stack, stackSpotNode.plugin, project)
+                if (stackSpotNode.plugin.inputs != null) {
+                    val isOkExit = PluginInputsPanel(stackSpotNode.plugin.inputs, project).showAndGet()
+                    if (isOkExit) {
+                        applyPluginCmd.run(NotifyStackSpotToolWindow(tree))
                     }
-                    ApplyPlugin(stackSpotNode.stack, stackSpotNode.plugin, project)
-                        .run(object : CommandRunner.CommandEndedListener {
-                            override fun notifyEnded() {
-                                stackSpotTree.notifyChange()
-                            }
-                        })
+                } else {
+                    applyPluginCmd.run(NotifyStackSpotToolWindow(tree))
                 }
             }
         }
@@ -139,10 +141,8 @@ class StackSpotCellRenderer(val tree: AbstractStackSpotTree) : DefaultTreeCellRe
     }
 
     private fun getLabelForeground(selected: Boolean, focused: Boolean): Color {
-        if (UIUtil.isUnderIntelliJLaF()) {
-            if (!selected && focused || selected && !focused) {
-                return UIUtil.getTreeForeground(true, true)
-            }
+        if (UIUtil.isUnderIntelliJLaF() && (!selected && focused || selected && !focused)) {
+            return UIUtil.getTreeForeground(true, true)
         }
         return UIUtil.getTreeForeground(selected, focused)
     }
@@ -151,7 +151,7 @@ class StackSpotCellRenderer(val tree: AbstractStackSpotTree) : DefaultTreeCellRe
         if (stackSpotNode.icon != null) {
             val icon = getIcon(stackSpotNode.icon, selected, focused)
             val jLabel = JLabel(icon)
-            if (stackSpotNode.plugin != null && stackSpotNode.isItPluginDependent()) {
+            if (stackSpotNode.plugin != null && stackSpotNode.hasDependent()) {
                 jLabel.toolTipText =
                     "This plugin has dependencies. First, apply these before proceeding: <br>" +
                             "${stackSpotNode.pluginsNotAppliedToString(isHtml = true)}"
