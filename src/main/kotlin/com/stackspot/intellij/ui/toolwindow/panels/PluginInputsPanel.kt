@@ -18,10 +18,7 @@ package com.stackspot.intellij.ui.toolwindow.panels
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
-import com.intellij.ui.dsl.builder.Panel
-import com.intellij.ui.dsl.builder.Row
-import com.intellij.ui.dsl.builder.panel
-import com.intellij.ui.dsl.builder.text
+import com.intellij.ui.dsl.builder.*
 import com.stackspot.model.Input
 import javax.swing.JComponent
 
@@ -44,6 +41,7 @@ class PluginInputsPanel(private val inputs: List<Input>, project: Project? = nul
         return when (input.type) {
             "bool" -> panel.row {
                 checkBox(input.label)
+                    .bindSelected({input.default as Boolean}, {})
             }
             "int" -> panel.row(input.label) {
                 intTextField()
@@ -62,5 +60,4 @@ class PluginInputsPanel(private val inputs: List<Input>, project: Project? = nul
             }
         }
     }
-
 }
