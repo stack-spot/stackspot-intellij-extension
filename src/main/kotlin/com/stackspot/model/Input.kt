@@ -16,6 +16,8 @@
 
 package com.stackspot.model
 
+import org.apache.commons.lang3.StringUtils
+
 data class Input(
     val type: String,
     val label: String,
@@ -35,4 +37,15 @@ data class Input(
             else -> value
         }
     }
+
+    fun containsDefaultValue(value: String): Boolean {
+        if (default == null) return false
+        default as List<*>
+        return default.contains(value)
+    }
+
+    fun getDefaultBoolean(): Boolean = if (default != null) default as Boolean else false
+
+    fun getDefaultString(): String = default?.toString() ?: StringUtils.EMPTY
+
 }

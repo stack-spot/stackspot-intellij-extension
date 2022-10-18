@@ -20,11 +20,13 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.ui.dsl.builder.*
 import com.stackspot.model.Input
+import org.apache.commons.lang3.StringUtils
 import javax.swing.JComponent
 
 class PluginInputsPanel(
     private val inputs: List<Input>,
-    project: Project? = null
+    project: Project? = null,
+    private var variablesMap: MutableMap<String, Any> = mutableMapOf()
 ) : DialogWrapper(project, true) {
 
     init {
@@ -32,7 +34,6 @@ class PluginInputsPanel(
         init()
     }
 
-    val variablesMap = mutableMapOf<String, Any>()
 
     override fun createCenterPanel(): JComponent {
         return panel {
@@ -46,26 +47,59 @@ class PluginInputsPanel(
         return when (input.type) {
             "bool" -> panel.row {
                 checkBox(input.label)
-                    .bindSelected({ input.default as Boolean }, { variablesMap[input.name] = it })
+                    .bindSelected({
+                        val defaultValue = input.getDefaultBoolean()
+                        variablesMap[input.name] = defaultValue
+                        defaultValue
+                    }, { variablesMap[input.name] = it })
             }
+
             "int" -> panel.row(input.label) {
                 intTextField()
-                    .bindText({ input.default.toString() }, { variablesMap[input.name] = it })
+                    .bindText(
+                        {
+                            val defaultValue = input.getDefaultString()
+                            variablesMap[input.name] = defaultValue
+                            defaultValue
+                        },
+                        { variablesMap[input.name] = it })
                     .comment(input.help)
 
             }
+
             "multiselect" -> panel.row(input.label) {
                 input.items?.forEach { item ->
+                    val isEnabled = input.containsDefaultValue(item)
+                    val key = "${input.name}_$item"
                     checkBox(item)
-                        .bindSelected({ input.default as Boolean }, { variablesMap[input.name] = it })
-                    TODO("Needs to add the new value instead of overwrite it")
+                        .bindSelected(
+                            {
+                                variablesMap[key] = isEnabled
+                                isEnabled
+                            },
+                            { variablesMap[key] = it })
                 }
             }
+
             else -> panel.row(input.label) {
-                input.items?.let { comboBox(it).comment(input.help) }
-                    ?: textField()
-                        .bindText({ input.default.toString() }, { variablesMap[input.name] = it })
-                        .comment(input.help)
+                val defaultValue = input.getDefaultString()
+                input.items?.let { items ->
+                    comboBox(items)
+                        .bindItem(
+                            {
+                                variablesMap[input.name] = defaultValue
+                                defaultValue
+                            },
+                            { variablesMap[input.name] = it ?: StringUtils.EMPTY }
+                        ).comment(input.help)
+                } ?: textField()
+                    .bindText(
+                        {
+                            variablesMap[input.name] = defaultValue
+                            defaultValue
+                        },
+                        { variablesMap[input.name] = it }
+                    ).comment(input.help)
             }
         }
     }
