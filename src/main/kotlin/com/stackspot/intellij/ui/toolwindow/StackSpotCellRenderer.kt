@@ -126,8 +126,8 @@ class StackSpotCellRenderer(val tree: AbstractStackSpotTree) : DefaultTreeCellRe
                     val isOkExit = pluginInputPanel.showAndGet()
                     if (isOkExit) {
                         
-                        val applyPluginCmd = ApplyPlugin(stackSpotNode.stack, stackSpotNode.plugin, project, arrayOf())
-                        applyPluginCmd.run(NotifyStackSpotToolWindow(tree))
+//                        val applyPluginCmd = ApplyPlugin(stackSpotNode.stack, stackSpotNode.plugin, project)
+//                        applyPluginCmd.run(NotifyStackSpotToolWindow(tree))
                     }
                 } else {
                     ApplyPlugin(stackSpotNode.stack, stackSpotNode.plugin, project).run(NotifyStackSpotToolWindow(tree))
