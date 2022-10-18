@@ -47,60 +47,53 @@ class PluginInputsPanel(
         return when (input.type) {
             "bool" -> panel.row {
                 checkBox(input.label)
-                    .bindSelected({
-                        val defaultValue = input.getDefaultBoolean()
-                        variablesMap[input.name] = defaultValue
-                        defaultValue
-                    }, { variablesMap[input.name] = it })
+                    .bindSelected(functionBoolean(input)) { variablesMap[input.name] = it }
+                    .comment(input.help)
             }
 
             "int" -> panel.row(input.label) {
                 intTextField()
-                    .bindText(
-                        {
-                            val defaultValue = input.getDefaultString()
-                            variablesMap[input.name] = defaultValue
-                            defaultValue
-                        },
-                        { variablesMap[input.name] = it })
+                    .bindText(functionString(input)) { variablesMap[input.name] = it }
                     .comment(input.help)
 
             }
 
             "multiselect" -> panel.row(input.label) {
                 input.items?.forEach { item ->
-                    val isEnabled = input.containsDefaultValue(item)
                     val key = "${input.name}_$item"
                     checkBox(item)
-                        .bindSelected(
-                            {
-                                variablesMap[key] = isEnabled
-                                isEnabled
-                            },
-                            { variablesMap[key] = it })
+                        .bindSelected(functionBoolean(input, item, key)) { variablesMap[key] = it }
+                        .comment(input.help)
                 }
             }
 
             else -> panel.row(input.label) {
-                val defaultValue = input.getDefaultString()
                 input.items?.let { items ->
                     comboBox(items)
-                        .bindItem(
-                            {
-                                variablesMap[input.name] = defaultValue
-                                defaultValue
-                            },
-                            { variablesMap[input.name] = it ?: StringUtils.EMPTY }
-                        ).comment(input.help)
+                        .bindItem(functionString(input)) { variablesMap[input.name] = it ?: StringUtils.EMPTY }
+                        .comment(input.help)
                 } ?: textField()
-                    .bindText(
-                        {
-                            variablesMap[input.name] = defaultValue
-                            defaultValue
-                        },
-                        { variablesMap[input.name] = it }
-                    ).comment(input.help)
+                    .bindText((functionString(input))) { variablesMap[input.name] = it }
+                    .comment(input.help)
             }
         }
+    }
+
+    private fun functionBoolean(input: Input, item: String, key: String): () -> Boolean = {
+        val isEnabled = input.containsDefaultValue(item)
+        variablesMap[key] = isEnabled
+        isEnabled
+    }
+
+    private fun functionBoolean(input: Input): () -> Boolean = {
+        val defaultValue = input.getDefaultBoolean()
+        variablesMap[input.name] = defaultValue
+        defaultValue
+    }
+
+    private fun functionString(input: Input): () -> String = {
+        val defaultValue = input.getDefaultString()
+        variablesMap[input.name] = defaultValue
+        defaultValue
     }
 }
