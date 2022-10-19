@@ -26,14 +26,13 @@ import javax.swing.JComponent
 class PluginInputsPanel(
     private val inputs: List<Input>,
     project: Project? = null,
-    private var variablesMap: MutableMap<String, Any> = mutableMapOf()
+    val variablesMap: MutableMap<String, Any> = mutableMapOf()
 ) : DialogWrapper(project, true) {
 
     init {
         title = "Plugin Inputs"
         init()
     }
-
 
     override fun createCenterPanel(): JComponent {
         return panel {
@@ -55,7 +54,6 @@ class PluginInputsPanel(
                 intTextField()
                     .bindText(functionString(input)) { variablesMap[input.name] = it }
                     .comment(input.help)
-
             }
 
             "multiselect" -> panel.row(input.label) {

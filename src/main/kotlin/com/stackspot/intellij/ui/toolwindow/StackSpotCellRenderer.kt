@@ -114,20 +114,20 @@ class StackSpotCellRenderer(val tree: AbstractStackSpotTree) : DefaultTreeCellRe
             if (stackSpotNode.hasPluginDependency()) {
                 val requirements = stackSpotNode.pluginsNotAppliedToString()
                 Messages.showWarningDialog("$PLUGIN_HAS_DEPENDENCY\n$requirements", COULD_NOT_APPLY_PLUGIN)
+                return@addActionListener
             }
 
             val stackSpotTree = (tree as AbstractStackSpotTree)
             val project = stackSpotTree.service.project
 
             if (stackSpotNode.stack != null && stackSpotNode.plugin != null && project != null) {
-
                 if (stackSpotNode.plugin.inputs != null) {
                     val pluginInputPanel = PluginInputsPanel(stackSpotNode.plugin.inputs, project)
                     val isOkExit = pluginInputPanel.showAndGet()
                     if (isOkExit) {
-                        
-//                        val applyPluginCmd = ApplyPlugin(stackSpotNode.stack, stackSpotNode.plugin, project)
-//                        applyPluginCmd.run(NotifyStackSpotToolWindow(tree))
+                        val inputValueAsFlags = extractVarsToCmd(pluginInputPanel.variablesMap)
+                        val applyPluginCmd = ApplyPlugin(stackSpotNode.stack, stackSpotNode.plugin, project, inputValueAsFlags)
+                        applyPluginCmd.run(NotifyStackSpotToolWindow(tree))
                     }
                 } else {
                     ApplyPlugin(stackSpotNode.stack, stackSpotNode.plugin, project).run(NotifyStackSpotToolWindow(tree))
@@ -217,5 +217,11 @@ class StackSpotCellRenderer(val tree: AbstractStackSpotTree) : DefaultTreeCellRe
         button.toolTipText = tooltipText
         button.isContentAreaFilled = false
         return button
+    }
+
+    private fun extractVarsToCmd(varsMap: Map<String, Any>): Array<String> {
+        val args = arrayOf<String>()
+        varsMap.forEach { (key, value) -> args.plus("--$key=$value") }
+        return args
     }
 }

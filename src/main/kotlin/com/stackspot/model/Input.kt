@@ -44,7 +44,7 @@ data class Input(
         return default.contains(value)
     }
 
-    fun getDefaultBoolean(): Boolean = if (default != null) default as Boolean else false
+    fun getDefaultBoolean(): Boolean = default as? Boolean ?: false
 
     fun getDefaultString(): String = default?.toString() ?: StringUtils.EMPTY
 

@@ -25,10 +25,9 @@ import com.stackspot.model.Stack
 class ApplyPlugin(
     private val stack: Stack,
     private val plugin: Plugin,
-    project: Project
+    project: Project,
+    private val inputFlags: Array<String> = arrayOf()
 ) : BaseCommand(StackSpotTerminalRunner(project)) {
-
-    var inputFlags: Array<String> = arrayOf()
 
     override fun commandLine() = listOf("stk", "apply", "plugin", "${stack.name}/${plugin.name}", *inputFlags)
 }
