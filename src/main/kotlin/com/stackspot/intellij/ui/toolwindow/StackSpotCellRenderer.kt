@@ -126,7 +126,8 @@ class StackSpotCellRenderer(val tree: AbstractStackSpotTree) : DefaultTreeCellRe
                     val isOkExit = pluginInputPanel.showAndGet()
                     if (isOkExit) {
                         val inputValueAsFlags = extractVarsToCmd(pluginInputPanel.variablesMap)
-                        val applyPluginCmd = ApplyPlugin(stackSpotNode.stack, stackSpotNode.plugin, project, inputValueAsFlags)
+                        val applyPluginCmd =
+                            ApplyPlugin(stackSpotNode.stack, stackSpotNode.plugin, project, inputValueAsFlags)
                         applyPluginCmd.run(NotifyStackSpotToolWindow(tree))
                     }
                 } else {
@@ -221,7 +222,14 @@ class StackSpotCellRenderer(val tree: AbstractStackSpotTree) : DefaultTreeCellRe
 
     private fun extractVarsToCmd(varsMap: Map<String, Any>): Array<String> {
         val args = arrayOf<String>()
-        varsMap.forEach { (key, value) -> args.plus("--$key=$value") }
+        varsMap.forEach { (key, value) ->
+            if (key.contains("_")) {
+                val multiSelectedKey = key.split("_")
+                args.plus("--$multiSelectedKey=$value")
+            } else {
+                args.plus("--$key=$value")
+            }
+        }
         return args
     }
 }
