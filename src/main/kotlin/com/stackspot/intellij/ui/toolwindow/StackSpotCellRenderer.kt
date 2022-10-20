@@ -225,7 +225,7 @@ class StackSpotCellRenderer(val tree: AbstractStackSpotTree) : DefaultTreeCellRe
         varsMap.forEach { (key, value) ->
             if (key.contains("_")) {
                 val multiSelectedKey = key.split("_")
-                args.plus("--$multiSelectedKey=$value")
+                args.plus("--${multiSelectedKey[0]}=$value")
             } else {
                 args.plus("--$key=$value")
             }
