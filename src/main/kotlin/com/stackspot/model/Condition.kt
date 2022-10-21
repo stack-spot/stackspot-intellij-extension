@@ -16,30 +16,65 @@
 
 package com.stackspot.model
 
-
 data class Condition(val variable: String, val operator: String, var value: String) {
 
     companion object {
         val OPERATIONS = mapOf(
             "==" to ::eq,
-            "!=" to ::neq
+            "!=" to ::neq,
+            ">" to ::gt,
+            "<" to ::lt,
+            ">=" to ::gte,
+            "<=" to ::lte,
+            "containsAny" to ::containsAny,
+            "containsAll" to ::containsAll,
+            "containsOnly" to ::containsOnly
         )
 
-        private fun eq(variableValue: String, value: String, input: Input): Boolean =
-            input.convert(variableValue) == input.convert(value)
+        private fun eq(variableValue: Any, value: Any, input: Input): Boolean =
+            variableValue as String == value as String
 
-        private fun neq(variableValue: String, value: String, input: Input): Boolean =
-            input.convert(variableValue) != input.convert(value)
+        private fun neq(variableValue: Any, value: Any, input: Input): Boolean =
+            variableValue as String != value as String
+
+        private fun gt(variableValue: Any, value: Any, input: Input): Boolean =
+            (variableValue as String).toInt() > (value as String).toInt()
+
+        private fun lt(variableValue: Any, value: Any, input: Input): Boolean =
+            (variableValue as String).toInt() < (value as String).toInt()
+
+        private fun gte(variableValue: Any, value: Any, input: Input): Boolean =
+            (variableValue as String).toInt() >= (value as String).toInt()
+
+        private fun lte(variableValue: Any, value: Any, input: Input): Boolean =
+            (variableValue as String).toInt() <= (value as String).toInt()
+
+        private fun containsAny(variableValue: Any, value: Any, input: Input): Boolean {
+            variableValue as Set<*>
+            value as Set<*>
+            return value.any { s -> variableValue.contains(s) }
+        }
+
+        private fun containsAll(variableValue: Any, value: Any, input: Input): Boolean {
+            variableValue as Set<*>
+            value as Set<*>
+            return variableValue.containsAll(value)
+        }
+
+        private fun containsOnly(variableValue: Any, value: Any, input: Input): Boolean {
+            variableValue as Set<*>
+            value as Set<*>
+            return variableValue == value
+        }
     }
 
-    fun evaluate(variables: Map<String, String>, input: Input): Boolean {
-        val variableValue = variables[variable]
+    fun evaluate(variableValue: Any?, input: Input): Boolean {
+        if (variableValue == null || variableValue == "") return false
         val operation = OPERATIONS[operator]
         return if (operation != null) {
-            operation(variableValue ?: "", value, input)
+            operation(variableValue, this.value, input)
         } else {
             false
         }
     }
-
 }
