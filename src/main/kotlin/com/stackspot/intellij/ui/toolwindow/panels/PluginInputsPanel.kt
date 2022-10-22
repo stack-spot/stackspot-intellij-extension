@@ -22,6 +22,7 @@ import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.openapi.ui.validation.CHECK_NON_EMPTY
 import com.intellij.openapi.ui.validation.validationTextErrorIf
 import com.intellij.ui.UIBundle
+import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.*
 import com.intellij.ui.layout.ValidationInfoBuilder
@@ -45,6 +46,7 @@ class PluginInputsPanel(
     val variablesMap: MutableMap<String, Any> = mutableMapOf(),
     private val checkBoxMap: MutableMap<String, Cell<JCheckBox>> = mutableMapOf(),
     private val componentMap: MutableMap<String, Cell<JComponent>> = mutableMapOf(),
+    private val checkBoxValuesMap: MutableMap<String, MutableSet<String>> =  mutableMapOf(),
 ) : DialogWrapper(project, true) {
 
     init {
@@ -117,35 +119,60 @@ class PluginInputsPanel(
         }
     }
 
-    private fun Row.verifyCondition(input: Input): Row {
-        input.condition?.let {
-            val value = when (val component = componentMap[it.variable]?.component) {
+    private fun Row.verifyCondition(anotherInput: Input): Row {
+
+        anotherInput.condition?.let { c ->
+            val input = inputs.first { input -> input.name == c.variable }
+            if (input.type == "multiselect") {
+                input.items?.forEach { item ->
+                    val component = componentMap["${c.variable}_${item}"]?.component as JCheckBox
+                    component.addItemListener { cb ->
+                        var valueList = checkBoxValuesMap[input.name]
+
+                        if (valueList == null) {
+                            checkBoxValuesMap[input.name] = mutableSetOf()
+                            valueList = checkBoxValuesMap[input.name]
+                        }
+
+                        val text = (cb.item as JBCheckBox).text
+                        if (valueList?.contains(text) == true) valueList.remove(text) else valueList?.add(text)
+                        val isVisible = c.evaluate(valueList, input)
+                        this.visible(isVisible)
+                        this.enabled(isVisible)
+                    }
+                }
+                return this
+            }
+
+            val value = when (val component = componentMap[c.variable]?.component) {
                 is JBTextField -> {
-                    component.document.addDocumentListener(TextFieldListener(component, it, this, input))
+                    component.document.addDocumentListener(TextFieldListener(component, c, this, input))
                     component.text
                 }
 
                 is JCheckBox -> {
-                    component.addItemListener(ItemListener { _ ->
-                        val result = (componentMap[it.variable]?.component as JCheckBox).isSelected
-                        val isVisible = it.evaluate(result, input)
+                    component.addItemListener(ItemListener {
+                        val result = (componentMap[c.variable]?.component as JCheckBox).isSelected
+                        val isVisible = c.evaluate(result, input)
                         this.visible(isVisible)
+                        this.enabled(isVisible)
                     })
                     component.isSelected
                 }
 
                 is JComboBox<*> -> {
-                    component.addItemListener(ItemListener { _ ->
-                        val result = (componentMap[it.variable]?.component as JComboBox<*>).selectedItem
-                        val isVisible = it.evaluate(result, input)
+                    component.addItemListener(ItemListener {
+                        val result = (componentMap[c.variable]?.component as JComboBox<*>).selectedItem
+                        val isVisible = c.evaluate(result, input)
                         this.visible(isVisible)
+                        this.enabled(isVisible)
                     })
                     component.selectedItem
                 }
 
                 else -> null
             }
-            val result = it.evaluate(value, input)
+            val result = c.evaluate(value, input)
             this.visible(result)
         }
         return this

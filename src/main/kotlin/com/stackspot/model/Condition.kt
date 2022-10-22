@@ -16,7 +16,7 @@
 
 package com.stackspot.model
 
-data class Condition(val variable: String, val operator: String, var value: String) {
+data class Condition(val variable: String, val operator: String, var value: Any) {
 
     companion object {
         val OPERATIONS = mapOf(
@@ -32,10 +32,10 @@ data class Condition(val variable: String, val operator: String, var value: Stri
         )
 
         private fun eq(variableValue: Any, value: Any, input: Input): Boolean =
-            variableValue as String == value as String
+            variableValue as String == (value as String)
 
         private fun neq(variableValue: Any, value: Any, input: Input): Boolean =
-            variableValue as String != value as String
+            variableValue as String != (value as String)
 
         private fun gt(variableValue: Any, value: Any, input: Input): Boolean =
             (variableValue as String).toInt() > (value as String).toInt()
@@ -51,20 +51,31 @@ data class Condition(val variable: String, val operator: String, var value: Stri
 
         private fun containsAny(variableValue: Any, value: Any, input: Input): Boolean {
             variableValue as Set<*>
-            value as Set<*>
-            return value.any { s -> variableValue.contains(s) }
+            return when (value) {
+                is String -> variableValue.contains(value)
+                else -> (value as ArrayList<*>).any { s -> variableValue.contains(s) }
+            }
         }
 
         private fun containsAll(variableValue: Any, value: Any, input: Input): Boolean {
             variableValue as Set<*>
-            value as Set<*>
-            return variableValue.containsAll(value)
+            return when (value) {
+                is String -> variableValue.contains(value)
+                else -> variableValue.containsAll(value as ArrayList<*>)
+            }
         }
 
         private fun containsOnly(variableValue: Any, value: Any, input: Input): Boolean {
             variableValue as Set<*>
-            value as Set<*>
-            return variableValue == value
+            return when (value) {
+                is String -> {
+                    val valueList = mutableSetOf<String>()
+                    valueList.add(value)
+                    variableValue == valueList
+                }
+
+                else -> variableValue == value
+            }
         }
     }
 
