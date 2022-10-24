@@ -16,6 +16,8 @@
 
 package com.stackspot.model
 
+import com.intellij.openapi.ui.naturalSorted
+
 data class Condition(val variable: String, val operator: String, var value: Any) {
 
     companion object {
@@ -71,10 +73,12 @@ data class Condition(val variable: String, val operator: String, var value: Any)
                 is String -> {
                     val valueList = mutableSetOf<String>()
                     valueList.add(value)
-                    variableValue == valueList
+                    variableValue.toString() == valueList.toString()
                 }
-
-                else -> variableValue == value
+                else -> {
+                    value as ArrayList<*>
+                    variableValue.naturalSorted().toString() == value.naturalSorted().toString()
+                }
             }
         }
     }

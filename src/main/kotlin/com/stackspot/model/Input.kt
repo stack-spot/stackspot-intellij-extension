@@ -16,6 +16,7 @@
 
 package com.stackspot.model
 
+import com.intellij.util.containers.isNullOrEmpty
 import org.apache.commons.lang3.StringUtils
 
 data class Input(
@@ -29,6 +30,11 @@ data class Input(
     val pattern: String? = null,
     val help: String? = null
 ) {
+
+    val typeValue: String
+        get() {
+            return if (type == "text" && !items.isNullOrEmpty()) "list" else type
+        }
 
     fun convert(value: String): Comparable<*> {
         return when (type) {
