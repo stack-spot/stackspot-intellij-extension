@@ -224,9 +224,9 @@ class StackSpotCellRenderer(val tree: AbstractStackSpotTree) : DefaultTreeCellRe
         val args = mutableListOf<String>()
         varsMap.forEach { (key, value) ->
             if (value is Set<*>) {
-                value.forEach { elem -> args.add("--$key=$elem") }
+                value.forEach { elem -> args.add("--$key $elem") }
             } else {
-                args.add("--$key=$value")
+                args.add("--$key $value")
             }
         }
 
