@@ -223,7 +223,7 @@ class StackSpotCellRenderer(val tree: AbstractStackSpotTree) : DefaultTreeCellRe
     private fun extractVarsToCmd(varsMap: Map<String, Any>): Array<String> {
         val args = mutableListOf<String>()
         varsMap.forEach { (key, value) ->
-            if (value is List<*>) {
+            if (value is Set<*>) {
                 value.forEach { elem -> args.add("--$key=$elem") }
             } else {
                 args.add("--$key=$value")
