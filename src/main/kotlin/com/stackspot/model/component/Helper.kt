@@ -26,7 +26,6 @@ data class Helper(
     val variablesMap: MutableMap<String, Any> = mutableMapOf(),
     val checkBoxList: MutableSet<Cell<JCheckBox>> = mutableSetOf(),
     val componentMap: MutableMap<String, Cell<JComponent>> = mutableMapOf(),
-    val checkBoxValuesMap: MutableMap<String, MutableSet<String>> =  mutableMapOf()
 ) {
     lateinit var input: Input
     lateinit var panel: Panel

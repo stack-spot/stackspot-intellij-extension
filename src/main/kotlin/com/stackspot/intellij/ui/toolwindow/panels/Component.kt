@@ -79,8 +79,8 @@ class IntComponent : ComponentType {
 
 class MultiselectComponent : ComponentType {
     override fun create(helper: Helper): Row {
-        helper.checkBoxValuesMap[helper.input.name] = mutableSetOf()
-        val valueList = helper.checkBoxValuesMap[helper.input.name]
+        helper.variablesMap[helper.input.name] = mutableSetOf<String>()
+        val valueList = helper.variablesMap[helper.input.name] as MutableSet<String>
 
         return helper.panel.row(helper.input.label) {
             helper.input.items?.forEach { item ->
@@ -88,7 +88,7 @@ class MultiselectComponent : ComponentType {
                 val checkBox = checkBox(item)
                     .bindSelected(
                         getterBoolean(helper.input, item, valueList)
-                    ) {}
+                    ) { if (it) valueList.add(item) else valueList.remove(item) }
                     .comment(helper.input.help)
                 helper.checkBoxList.add(checkBox)
                 helper.componentMap[key] = checkBox

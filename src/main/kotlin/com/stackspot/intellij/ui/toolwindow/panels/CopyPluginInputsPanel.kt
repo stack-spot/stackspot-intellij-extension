@@ -103,7 +103,7 @@ class CopyPluginInputsPanel(
                     val key = "${c.variable}_${item}"
                     val component = helper.componentMap[key]?.component as JCheckBox
                     component.addItemListener { cb ->
-                        val valueList = helper.checkBoxValuesMap.getOrDefault(input.name, mutableSetOf())
+                        val valueList = helper.variablesMap[input.name] as MutableSet<String>
                         val text = (cb.item as JBCheckBox).text
                         if (valueList.contains(text)) valueList.remove(text) else valueList.add(text)
                         val isActive = c.evaluate(valueList, input)
