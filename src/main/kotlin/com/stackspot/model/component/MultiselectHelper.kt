@@ -14,23 +14,18 @@
  * limitations under the License.
  */
 
-package com.stackspot.intellij.ui.toolwindow.panels
+package com.stackspot.model.component
 
-import com.intellij.ui.dsl.builder.Row
-import com.stackspot.model.component.Helper
+import com.intellij.ui.dsl.builder.Cell
+import com.stackspot.model.Input
+import javax.swing.JCheckBox
+import javax.swing.JComponent
 
-abstract class ComponentValidationHandler {
+data class MultiselectHelper(
+    val variableValues: MutableSet<Any>,
+    val checkBoxList: MutableSet<Cell<JCheckBox>>,
+    val components: MutableSet<Cell<JComponent>>,
+    val input: Input
+)
 
-    private var next: ComponentValidationHandler? = null
 
-    fun linkHandler(handler: ComponentValidationHandler): ComponentValidationHandler {
-        this.next = handler
-        return handler
-    }
-
-    abstract fun check(helper: Helper, row: Row): Row?
-
-    fun checkNext(helper: Helper, row: Row): Row? {
-        return next?.check(helper, row)
-    }
-}

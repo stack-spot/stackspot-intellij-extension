@@ -22,27 +22,29 @@ import com.intellij.openapi.ui.validation.validationTextErrorIf
 import com.intellij.ui.UIBundle
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.*
-import com.intellij.ui.layout.ValidationInfoBuilder
+import com.intellij.util.MathUtil
 import com.stackspot.model.Input
 import com.stackspot.model.component.Helper
 import org.apache.commons.lang3.StringUtils
+import java.awt.event.KeyAdapter
+import java.awt.event.KeyEvent
 
 interface ComponentType {
     fun create(helper: Helper): Row
 }
 
+private const val IT_MUST_BE_SELECTED = "It must be selected"
+
 class BoolComponent : ComponentType {
     override fun create(helper: Helper): Row {
         return helper.panel.row {
             val field = checkBox(helper.input.label)
-                .bindSelected(
-                    getterBoolean(
-                        helper.input,
-                        helper.variablesMap
-                    )
-                ) { helper.variablesMap[helper.input.name] = it }
+                .bindSelected(getterBoolean(helper)) { helper.addValues(it) }
                 .comment(helper.input.help)
-            helper.componentMap[helper.input.name] = field
+                .validationOnApply {
+                    if (helper.input.required && !it.isSelected) ValidationInfo(IT_MUST_BE_SELECTED) else null
+                }
+            helper.components.add(field)
         }
     }
 }
@@ -51,47 +53,51 @@ private const val ENTER_A_NUMBER = "please.enter.a.number"
 
 class IntComponent : ComponentType {
     override fun create(helper: Helper): Row {
+
         return helper.panel.row(helper.input.label) {
             val field = textField()
-                .bindText(getterString(helper.input, helper.variablesMap)) {
-                    helper.variablesMap[helper.input.name] = it
-                }
+                .bindText(getterString(helper)) { helper.addValues(it) }
                 .comment(helper.input.help)
             validatePattern(field, helper.input)
-            field.validationOnInput { validateIfInputIsNumber(it, helper.input) }
-            field.columns(COLUMNS_TINY)
-            helper.componentMap[helper.input.name] = field
+            validateIfInputIsNumber(field)
+            field.columns(10)
+            field.component.addKeyListener(object : KeyAdapter() {
+                override fun keyPressed(e: KeyEvent?) {
+                    val text = field.component.text
+                    if (text.length >= 7 && text.toIntOrNull() != null) {
+                        var value = text.toIntOrNull()
+                        value = value?.let { MathUtil.clamp(it, 0, 9999999) }
+                        field.component.text = ""
+                        field.component.text = value.toString()
+                        e?.consume()
+                    }
+                }
+            })
+            helper.components.add(field)
         }
     }
 
-    private fun ValidationInfoBuilder.validateIfInputIsNumber(
-        it: JBTextField, input: Input
-    ): ValidationInfo? {
-        val value = it.text
+    private fun validateIfInputIsNumber(field: Cell<JBTextField>) {
+
         val regex = "^[0-9]*\$".toRegex()
-        return when {
-            value == null && input.required -> error(UIBundle.message(ENTER_A_NUMBER))
-            value != null && !regex.matches(value) -> error(UIBundle.message(ENTER_A_NUMBER))
-            else -> null
+
+        val checkPattern = validationTextErrorIf(UIBundle.message(ENTER_A_NUMBER)) {
+            !regex.matches(it) && field.component.isVisible
         }
+
+        checkPattern.let { field.textValidation(it) }
     }
 }
 
 class MultiselectComponent : ComponentType {
     override fun create(helper: Helper): Row {
-        helper.variablesMap[helper.input.name] = mutableSetOf<String>()
-        val valueList = helper.variablesMap[helper.input.name] as MutableSet<String>
-
         return helper.panel.row(helper.input.label) {
             helper.input.items?.forEach { item ->
-                val key = "${helper.input.name}_$item"
+                val values = helper.variableValues
                 val checkBox = checkBox(item)
-                    .bindSelected(
-                        getterBoolean(helper.input, item, valueList)
-                    ) { if (it) valueList.add(item) else valueList.remove(item) }
+                    .bindSelected(getterBoolean(helper, item)) { if (it) values.add(item) else values.remove(item) }
                     .comment(helper.input.help)
                 helper.checkBoxList.add(checkBox)
-                helper.componentMap[key] = checkBox
             }
         }
     }
@@ -101,15 +107,10 @@ class TextComponent : ComponentType {
     override fun create(helper: Helper): Row {
         return helper.panel.row(helper.input.label) {
             val field = textField()
-                .bindText(
-                    (getterString(
-                        helper.input,
-                        helper.variablesMap
-                    ))
-                ) { helper.variablesMap[helper.input.name] = it }
+                .bindText(getterString(helper)) { helper.addValues(it) }
                 .comment(helper.input.help)
             validatePattern(field, helper.input)
-            helper.componentMap[helper.input.name] = field
+            helper.components.add(field)
         }
     }
 }
@@ -123,7 +124,6 @@ private fun validatePattern(field: Cell<JBTextField>, input: Input) {
             !pattern.matches(it) && field.component.isVisible
         }
     }
-
     checkPattern?.let { field.textValidation(it) }
     if (input.required) field.textValidation(CHECK_NON_EMPTY)
 }
@@ -134,36 +134,34 @@ class ListComponent : ComponentType {
         return helper.panel.row(helper.input.label) {
             helper.input.items?.let { items ->
                 val field = comboBox(items)
-                    .bindItem(getterString(helper.input, helper.variablesMap)) {
-                        helper.variablesMap[helper.input.name] = it ?: StringUtils.EMPTY
-                    }
+                    .bindItem(getterString(helper)) { helper.addValues(it ?: StringUtils.EMPTY) }
                     .comment(helper.input.help)
-                helper.componentMap[helper.input.name] = field
+                helper.components.add(field)
             }
         }
+
     }
 }
 
 private fun getterBoolean(
-    input: Input,
-    item: String,
-    multiselectVariable: MutableSet<String>? = mutableSetOf()
+    helper: Helper,
+    item: String
 ): () -> Boolean = {
-    val isEnabled = input.containsDefaultValue(item)
+    val isEnabled = helper.input.containsDefaultValue(item)
     if (isEnabled) {
-        multiselectVariable?.add(item)
+        helper.variableValues.add(item)
     }
     isEnabled
 }
 
-private fun getterBoolean(input: Input, variablesMap: MutableMap<String, Any>): () -> Boolean = {
-    val defaultValue = input.getDefaultBoolean()
-    variablesMap[input.name] = defaultValue
+private fun getterBoolean(helper: Helper): () -> Boolean = {
+    val defaultValue = helper.input.getDefaultBoolean()
+    helper.variableValues.add(defaultValue)
     defaultValue
 }
 
-private fun getterString(input: Input, variablesMap: MutableMap<String, Any>): () -> String = {
-    val defaultValue = input.getDefaultString()
-    variablesMap[input.name] = defaultValue
+private fun getterString(helper: Helper): () -> String = {
+    val defaultValue = helper.input.getDefaultString()
+    helper.variableValues.add(defaultValue)
     defaultValue
 }

@@ -33,25 +33,55 @@ data class Condition(val variable: String, val operator: String, var value: Any)
             "containsOnly" to ::containsOnly
         )
 
-        private fun eq(variableValue: Any, value: Any, input: Input): Boolean =
-            variableValue as String == (value as String)
+        private fun eq(variableValue: Any, value: Any): Boolean =
+            variableValue.toString() == value.toString()
 
-        private fun neq(variableValue: Any, value: Any, input: Input): Boolean =
-            variableValue as String != (value as String)
+        private fun neq(variableValue: Any, value: Any): Boolean =
+            variableValue.toString() != value.toString()
 
-        private fun gt(variableValue: Any, value: Any, input: Input): Boolean =
-            (variableValue as String).toInt() > (value as String).toInt()
+        private fun gt(variableValue: Any, value: Any): Boolean {
+            variableValue as String
+            val longValue = variableValue.toLongOrNull()
+            val conditionValue = value.toString().toLongOrNull()
+            if (longValue != null && conditionValue != null) {
+                return variableValue.toLong() > conditionValue
+            }
+            return false
+        }
 
-        private fun lt(variableValue: Any, value: Any, input: Input): Boolean =
-            (variableValue as String).toInt() < (value as String).toInt()
 
-        private fun gte(variableValue: Any, value: Any, input: Input): Boolean =
-            (variableValue as String).toInt() >= (value as String).toInt()
+        private fun lt(variableValue: Any, value: Any): Boolean {
+            variableValue as String
+            val longValue = variableValue.toLongOrNull()
+            val conditionValue = value.toString().toLongOrNull()
+            if (longValue != null && conditionValue != null) {
+                return variableValue.toLong() < conditionValue
+            }
+            return false
+        }
 
-        private fun lte(variableValue: Any, value: Any, input: Input): Boolean =
-            (variableValue as String).toInt() <= (value as String).toInt()
 
-        private fun containsAny(variableValue: Any, value: Any, input: Input): Boolean {
+        private fun gte(variableValue: Any, value: Any): Boolean {
+            variableValue as String
+            val longValue = variableValue.toLongOrNull()
+            val conditionValue = value.toString().toLongOrNull()
+            if (longValue != null && conditionValue != null) {
+                return variableValue.toLong() >= conditionValue
+            }
+            return false
+        }
+
+        private fun lte(variableValue: Any, value: Any): Boolean {
+            variableValue as String
+            val longValue = variableValue.toLongOrNull()
+            val conditionValue = value.toString().toLongOrNull()
+            if (longValue != null && conditionValue != null) {
+                return variableValue.toLong() <= conditionValue
+            }
+            return false
+        }
+
+        private fun containsAny(variableValue: Any, value: Any): Boolean {
             variableValue as Set<*>
             return when (value) {
                 is String -> variableValue.contains(value)
@@ -59,7 +89,7 @@ data class Condition(val variable: String, val operator: String, var value: Any)
             }
         }
 
-        private fun containsAll(variableValue: Any, value: Any, input: Input): Boolean {
+        private fun containsAll(variableValue: Any, value: Any): Boolean {
             variableValue as Set<*>
             return when (value) {
                 is String -> variableValue.contains(value)
@@ -67,7 +97,7 @@ data class Condition(val variable: String, val operator: String, var value: Any)
             }
         }
 
-        private fun containsOnly(variableValue: Any, value: Any, input: Input): Boolean {
+        private fun containsOnly(variableValue: Any, value: Any): Boolean {
             variableValue as Set<*>
             return when (value) {
                 is String -> {
@@ -83,11 +113,11 @@ data class Condition(val variable: String, val operator: String, var value: Any)
         }
     }
 
-    fun evaluate(variableValue: Any?, input: Input): Boolean {
+    fun evaluate(variableValue: Any?): Boolean {
         if (variableValue == null || variableValue == "") return false
         val operation = OPERATIONS[operator]
         return if (operation != null) {
-            operation(variableValue, this.value, input)
+            operation(variableValue, this.value)
         } else {
             false
         }

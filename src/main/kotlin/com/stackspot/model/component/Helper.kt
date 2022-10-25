@@ -23,12 +23,22 @@ import javax.swing.JCheckBox
 import javax.swing.JComponent
 
 data class Helper(
-    val variablesMap: MutableMap<String, Any> = mutableMapOf(),
+    var variableValues: MutableSet<Any> = mutableSetOf(),
     val checkBoxList: MutableSet<Cell<JCheckBox>> = mutableSetOf(),
-    val componentMap: MutableMap<String, Cell<JComponent>> = mutableMapOf(),
+    val components: MutableSet<Cell<JComponent>> = mutableSetOf(),
+    val dependsOn: MutableSet<Cell<JComponent>?> = mutableSetOf(),
+    var dependsOnMultiselect: MultiselectHelper? = null,
+    var isActive: Boolean = dependsOn.isEmpty() || dependsOnMultiselect == null
 ) {
     lateinit var input: Input
     lateinit var panel: Panel
+
+    fun addValues(element: Any) {
+        if (isActive) {
+            variableValues.clear()
+            variableValues.add(element)
+        }
+    }
 }
 
 

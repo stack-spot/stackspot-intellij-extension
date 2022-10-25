@@ -19,7 +19,6 @@ package com.stackspot.intellij.ui.toolwindow
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.IconLoader
 import com.intellij.ui.ColorUtil
-import com.intellij.util.containers.toArray
 import com.intellij.util.ui.UIUtil
 import com.stackspot.intellij.commands.listeners.NotifyStackSpotToolWindow
 import com.stackspot.intellij.commands.listeners.NotifyStacksUpdatedCommandListener
@@ -27,7 +26,7 @@ import com.stackspot.intellij.commands.stk.ApplyPlugin
 import com.stackspot.intellij.commands.stk.DeleteStack
 import com.stackspot.intellij.commands.stk.UpdateStack
 import com.stackspot.intellij.ui.Icons
-import com.stackspot.intellij.ui.toolwindow.panels.CopyPluginInputsPanel
+import com.stackspot.intellij.ui.toolwindow.panels.PluginInputsPanel
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
@@ -123,7 +122,7 @@ class StackSpotCellRenderer(val tree: AbstractStackSpotTree) : DefaultTreeCellRe
 
             if (stackSpotNode.stack != null && stackSpotNode.plugin != null && project != null) {
                 if (stackSpotNode.plugin.inputs != null) {
-                    val pluginInputPanel = CopyPluginInputsPanel(stackSpotNode.plugin.inputs, project)
+                    val pluginInputPanel = PluginInputsPanel(stackSpotNode.plugin, project)
                     val isOkExit = pluginInputPanel.showAndGet()
                     if (isOkExit) {
                         val inputValueAsFlags = extractVarsToCmd(pluginInputPanel.variablesMap)
