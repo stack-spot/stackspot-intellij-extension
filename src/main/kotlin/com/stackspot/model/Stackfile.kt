@@ -19,7 +19,7 @@ package com.stackspot.model
 data class Stackfile(
     val type: String,
     val description: String,
-    val template: String,
+    val template: String?,
     val inputs: Map<String, Any>? = null,
     val plugins: List<StackfilePlugin>? = null
 ) {
