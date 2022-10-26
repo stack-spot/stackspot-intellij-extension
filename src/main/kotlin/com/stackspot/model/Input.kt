@@ -36,14 +36,6 @@ data class Input(
             return if (type == "text" && !items.isNullOrEmpty()) "list" else type
         }
 
-    fun convert(value: String): Comparable<*> {
-        return when (type) {
-            "bool" -> value.toBoolean()
-            "int" -> value.toInt()
-            else -> value
-        }
-    }
-
     fun containsDefaultValue(value: String): Boolean {
         if (default == null) return false
         default as List<*>
