@@ -20,7 +20,6 @@ import com.intellij.openapi.project.Project
 import com.stackspot.intellij.commands.BaseCommand
 import com.stackspot.intellij.ui.StackSpotTerminalRunner
 
-class UpdateAllStacks(private val project: Project) :
-    BaseCommand(StackSpotTerminalRunner(project)) {
+class UpdateAllStacks(project: Project) : BaseCommand(StackSpotTerminalRunner(project)) {
     override fun commandLine() = listOf("stk", "update", "stack")
 }

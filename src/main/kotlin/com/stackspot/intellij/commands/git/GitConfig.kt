@@ -19,8 +19,7 @@ package com.stackspot.intellij.commands.git
 import com.stackspot.intellij.commands.BackgroundCommandRunner
 import com.stackspot.intellij.commands.BaseCommand
 
-class GitConfig(var workingDirectory: String) :
-    BaseCommand(BackgroundCommandRunner(workingDirectory)) {
+class GitConfig : BaseCommand(BackgroundCommandRunner()) {
 
     var flags: Array<String> = arrayOf()
 

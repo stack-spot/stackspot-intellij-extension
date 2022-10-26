@@ -17,7 +17,6 @@
 package com.stackspot.intellij.services
 
 import com.intellij.openapi.components.Service
-import com.stackspot.constants.Constants
 import com.stackspot.intellij.commands.BackgroundCommandRunner
 import com.stackspot.intellij.commands.git.GitConfig
 import com.stackspot.intellij.commands.stk.Version
@@ -49,11 +48,11 @@ class CreateProjectService() {
         }
 
     private var version = Version()
-    private var gitConfigCmd = GitConfig(Constants.Paths.STK_HOME.toString())
+    private var gitConfigCmd = GitConfig()
 
     constructor(
         version: Version = Version(),
-        gitConfigCmd: GitConfig = GitConfig(Constants.Paths.STK_HOME.toString())
+        gitConfigCmd: GitConfig = GitConfig()
     ) : this() {
         this.version = version
         this.gitConfigCmd = gitConfigCmd
@@ -63,6 +62,7 @@ class CreateProjectService() {
         val stdout = version.runSync().stdout
         return stdout.contains(STK_VERSION_MESSAGE)
     }
+
     fun isStackfileSelected(): Boolean = stack != null && stackfile != null
 
     fun clearInfo() {

@@ -16,22 +16,33 @@
 
 package com.stackspot.intellij.commands
 
+import com.stackspot.constants.Constants
 import kotlinx.coroutines.Deferred
-
 
 interface CommandRunner {
 
     companion object {
-        val STK_CHANNEL_ENVIRONMENT_VARIABLE = "STK_CHANNEL"
-        val STK_CHANNLE_INTELLIJ = "intellij"
+        const val STK_CHANNEL_ENVIRONMENT_VARIABLE = "STK_CHANNEL"
+        const val STK_CHANNEL_INTELLIJ = "intellij"
     }
 
     interface CommandEndedListener {
         fun notifyEnded()
     }
 
-    fun run(commandLine: List<String>, listener: CommandEndedListener? = null)
+    fun run(
+        commandLine: List<String>,
+        listener: CommandEndedListener? = null,
+        workingDir: String? = Constants.Paths.STK_HOME.toString()
+    )
 
-    fun runSync(commandLine: List<String>): BackgroundCommandRunner
-    suspend fun runAsync(commandLine: List<String>): Deferred<BackgroundCommandRunner>
+    fun runSync(
+        commandLine: List<String>,
+        workingDir: String? = Constants.Paths.STK_HOME.toString()
+    ): BackgroundCommandRunner
+
+    suspend fun runAsync(
+        commandLine: List<String>,
+        workingDir: String? = Constants.Paths.STK_HOME.toString()
+    ): Deferred<BackgroundCommandRunner>
 }

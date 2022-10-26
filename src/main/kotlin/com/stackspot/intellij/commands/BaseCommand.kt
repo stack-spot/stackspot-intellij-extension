@@ -20,7 +20,10 @@ import kotlinx.coroutines.Deferred
 
 abstract class BaseCommand(val runner: CommandRunner) : Command {
     abstract fun commandLine(): List<String>
-    override fun run(listener: CommandRunner.CommandEndedListener?) = runner.run(commandLine(), listener)
-    override fun runSync(): BackgroundCommandRunner = runner.runSync(commandLine())
-    override suspend fun runAsync(): Deferred<BackgroundCommandRunner> = runner.runAsync(commandLine())
+    override fun run(listener: CommandRunner.CommandEndedListener?, workingDir: String?) =
+        runner.run(commandLine(), listener, workingDir)
+
+    override fun runSync(workingDir: String?): BackgroundCommandRunner = runner.runSync(commandLine(), workingDir)
+    override suspend fun runAsync(workingDir: String?): Deferred<BackgroundCommandRunner> =
+        runner.runAsync(commandLine(), workingDir)
 }

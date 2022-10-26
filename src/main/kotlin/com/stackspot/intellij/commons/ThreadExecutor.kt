@@ -16,13 +16,14 @@
 
 package com.stackspot.intellij.commons
 
-import kotlinx.coroutines.*
-import org.jetbrains.concurrency.runAsync
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.async
+import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
-
-fun <R: Any> singleThread(
+fun <R : Any> singleThread(
     timeout: Long = 500L,
     unit: TimeUnit = TimeUnit.MILLISECONDS,
     lambda: () -> R
@@ -46,7 +47,7 @@ fun <R: Any> singleThread(
     return result as R
 }
 
-suspend fun <R: Any> singleThreadAsCoroutine(
+suspend fun <R : Any> singleThreadAsCoroutine(
     lambda: () -> R
 ): Deferred<R> {
     val dispatch = Executors.newSingleThreadExecutor().asCoroutineDispatcher()

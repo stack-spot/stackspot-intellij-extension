@@ -30,12 +30,12 @@ import java.util.logging.Logger
 @Service
 class GetDocumentationService() {
 
-    private var gitConfigCmd = GitConfig(Constants.Paths.STK_HOME.toString())
-    private var gitBranchCmd = GitBranch(Constants.Paths.STK_HOME.toString(), arrayOf("--show-current"))
+    private var gitConfigCmd = GitConfig()
+    private var gitBranchCmd = GitBranch(arrayOf("--show-current"))
 
     constructor(
-        gitConfigCmd: GitConfig = GitConfig(Constants.Paths.STK_HOME.toString()),
-        gitBranchCmd: GitBranch = GitBranch(Constants.Paths.STK_HOME.toString(), arrayOf("--show-current"))
+        gitConfigCmd: GitConfig = GitConfig(),
+        gitBranchCmd: GitBranch = GitBranch(arrayOf("--show-current"))
     ) : this() {
         this.gitConfigCmd = gitConfigCmd
         this.gitBranchCmd = gitBranchCmd
@@ -83,15 +83,15 @@ class GetDocumentationService() {
     }
 
     private fun getRemoteUrl(stack: Stack): String {
-        gitConfigCmd.workingDirectory = stack.location.toPath().parent.toString()
+        val workingDir = stack.location.toPath().parent.toString()
         gitConfigCmd.flags = arrayOf("--get", "remote.origin.url")
-        gitConfigCmd.run()
+        gitConfigCmd.run(workingDir = workingDir)
         return (gitConfigCmd.runner as BackgroundCommandRunner).stdout
     }
 
     private fun getCurrentBranchName(stack: Stack): String {
-        gitBranchCmd.workingDir = stack.location.toPath().toString()
-        gitBranchCmd.run()
+        val workingDir = stack.location.toPath().parent.toString()
+        gitBranchCmd.run(workingDir = workingDir)
         return (gitBranchCmd.runner as BackgroundCommandRunner).stdout
     }
 

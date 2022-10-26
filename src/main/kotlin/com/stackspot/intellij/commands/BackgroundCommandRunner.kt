@@ -23,7 +23,7 @@ import com.stackspot.intellij.commons.singleThreadAsCoroutine
 import kotlinx.coroutines.Deferred
 import java.nio.charset.Charset
 
-class BackgroundCommandRunner(private var workingDir: String? = null) : CommandRunner {
+class BackgroundCommandRunner : CommandRunner {
 
     var stdout: String = ""
         get() {
@@ -34,11 +34,11 @@ class BackgroundCommandRunner(private var workingDir: String? = null) : CommandR
     var timeout: Boolean = false
     var cancelled: Boolean = false
 
-    override fun run(commandLine: List<String>, listener: CommandRunner.CommandEndedListener?) {
+    override fun run(commandLine: List<String>, listener: CommandRunner.CommandEndedListener?, workingDir: String?) {
         val generalCommandLine = GeneralCommandLine(commandLine)
             .withCharset(Charset.forName("UTF-8"))
             .withWorkDirectory(workingDir)
-            .withEnvironment(CommandRunner.STK_CHANNEL_ENVIRONMENT_VARIABLE, CommandRunner.STK_CHANNLE_INTELLIJ)
+            .withEnvironment(CommandRunner.STK_CHANNEL_ENVIRONMENT_VARIABLE, CommandRunner.STK_CHANNEL_INTELLIJ)
         val processOutput = execAndGetOutput(generalCommandLine)
         stdout = processOutput.stdout
         stderr = processOutput.stderr
@@ -51,16 +51,14 @@ class BackgroundCommandRunner(private var workingDir: String? = null) : CommandR
     private fun replaceStdout(stdout: String) =
         stdout.replace("\\n".toRegex(), "")
 
-    override fun runSync(
-        commandLine: List<String>
-    ): BackgroundCommandRunner {
+    override fun runSync(commandLine: List<String>, workingDir: String?): BackgroundCommandRunner {
         return singleThread {
             var done = false
             this.run(commandLine, object : CommandRunner.CommandEndedListener {
                 override fun notifyEnded() {
                     done = true
                 }
-            })
+            }, workingDir)
 
             while (!done) {
                 Thread.sleep(1L)
@@ -69,16 +67,14 @@ class BackgroundCommandRunner(private var workingDir: String? = null) : CommandR
         }
     }
 
-    override suspend fun runAsync(
-        commandLine: List<String>
-    ): Deferred<BackgroundCommandRunner> {
+    override suspend fun runAsync(commandLine: List<String>,workingDir: String?): Deferred<BackgroundCommandRunner> {
         var done = false
         return singleThreadAsCoroutine {
             this.run(commandLine, object : CommandRunner.CommandEndedListener {
                 override fun notifyEnded() {
                     done = true
                 }
-            })
+            }, workingDir)
             this
         }
     }

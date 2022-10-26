@@ -16,13 +16,14 @@
 
 package com.stackspot.intellij.commands
 
+import com.stackspot.constants.Constants
 import kotlinx.coroutines.Deferred
 
 interface Command {
-    fun run(listener: CommandRunner.CommandEndedListener? = null)
+    fun run(listener: CommandRunner.CommandEndedListener? = null, workingDir: String? = Constants.Paths.STK_HOME.toString())
 
-    fun runSync(): BackgroundCommandRunner
+    fun runSync(workingDir: String? = Constants.Paths.STK_HOME.toString()): BackgroundCommandRunner
 
-    suspend fun runAsync(): Deferred<BackgroundCommandRunner>
+    suspend fun runAsync(workingDir: String? = Constants.Paths.STK_HOME.toString()): Deferred<BackgroundCommandRunner>
 
 }
