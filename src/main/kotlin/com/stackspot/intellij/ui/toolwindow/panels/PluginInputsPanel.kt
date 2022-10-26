@@ -21,7 +21,6 @@ import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.ui.Messages
 import com.intellij.ui.dsl.builder.Row
 import com.intellij.ui.dsl.builder.panel
-import com.stackspot.model.Input
 import com.stackspot.model.Plugin
 import com.stackspot.model.component.Helper
 import com.stackspot.model.component.MultiselectHelper
@@ -70,7 +69,7 @@ class PluginInputsPanel(
 
         if (strategy != null) {
             val validation = ValidationHandler()
-            return strategy.create(helper).let { validation.conditionValidation(helper, it) }
+            return strategy.create(helper).also { validation.conditionValidation(helper, it) }
         }
 
         Messages.showWarningDialog("Change <b>${helper.input.typeValue}</b> to a valid type", "Invalid input type")
@@ -96,7 +95,7 @@ class PluginInputsPanel(
     override fun showAndGet(): Boolean {
         check(isModal) { "The showAndGet() method is for modal dialogs only" }
         show()
-        helpers.filter { helper -> helper.isActive }.forEach{h -> variablesMap[h.input.name] = h.variableValues}
+        helpers.filter { helper -> helper.isActive }.forEach { h -> variablesMap[h.input.name] = h.variableValues }
         return isOK
     }
 }

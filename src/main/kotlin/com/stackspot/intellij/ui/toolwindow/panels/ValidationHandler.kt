@@ -79,8 +79,8 @@ class CheckBoxGroupValidation : ComponentValidationHandler() {
 
         if (checkBoxList.isNotEmpty()) {
             checkBoxList.first().validationOnApply {
-                val isSelected = helper.checkBoxList.none { it.component.isSelected }
-                if (isSelected) ValidationInfo(AT_LEAST_ONE_MUST_BE_SELECTED) else null
+                val isNotSelected = helper.checkBoxList.none { it.component.isSelected }
+                if (isNotSelected) ValidationInfo(AT_LEAST_ONE_MUST_BE_SELECTED) else null
             }
         }
 

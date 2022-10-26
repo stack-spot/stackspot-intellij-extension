@@ -53,6 +53,9 @@ class BoolComponent : ComponentType {
 
 private const val ENTER_A_NUMBER = "please.enter.a.number"
 
+private const val COLUMNS_SIZE = 10
+private const val MAX_TEXT_LENGTH = 7
+
 class IntComponent : ComponentType {
     override fun create(helper: Helper): Row {
 
@@ -62,11 +65,11 @@ class IntComponent : ComponentType {
                 .comment(helper.input.help)
             validatePattern(field, helper.input)
             validateIfInputIsNumber(field)
-            field.columns(10)
+            field.columns(COLUMNS_SIZE)
             field.component.addKeyListener(object : KeyAdapter() {
                 override fun keyPressed(e: KeyEvent?) {
                     val text = field.component.text
-                    if (text.length >= 7 && text.toIntOrNull() != null) {
+                    if (text.length >= MAX_TEXT_LENGTH && text.toIntOrNull() != null) {
                         var value = text.toIntOrNull()
                         value = value?.let { MathUtil.clamp(it, 0, 9999999) }
                         field.component.text = ""
