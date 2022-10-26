@@ -55,14 +55,10 @@ class CheckBoxValidation : ComponentValidationHandler() {
             component.addItemListener(ItemListener {
                 val isSelected = component.isSelected
                 val isActive = condition.evaluate(isSelected)
-                helper.isActive = isActive
-                row.enabled(isActive)
-                row.visible(isActive)
+                checkVisibility(helper, isActive, row)
             })
             val isActive = condition.evaluate(component.isSelected)
-            row.enabled(isActive)
-            row.visible(isActive)
-            helper.isActive = isActive
+            checkVisibility(helper, isActive, row)
             return row
         }
 
@@ -117,14 +113,10 @@ class ComboBoxValidation : ComponentValidationHandler() {
             component.addItemListener(ItemListener {
                 val item = component.selectedItem
                 val isActive = condition.evaluate(item)
-                helper.isActive = isActive
-                row.enabled(isActive)
-                row.visible(isActive)
+                checkVisibility(helper, isActive, row)
             })
             val isActive = condition.evaluate(component.selectedItem)
-            helper.isActive = isActive
-            row.enabled(isActive)
-            row.visible(isActive)
+            checkVisibility(helper, isActive, row)
             return row
         }
 
@@ -140,12 +132,9 @@ class TextValidation : ComponentValidationHandler() {
         if (component is JTextField && condition != null) {
             component.document.addDocumentListener(TextFieldListener(component, condition, row, helper))
             val isActive = condition.evaluate(component.text)
-            helper.isActive = isActive
-            row.enabled(isActive)
-            row.visible(isActive)
+            checkVisibility(helper, isActive, row)
             return row
         }
-
         return checkNext(helper, row)
     }
 }
@@ -165,23 +154,25 @@ class MultiselectValidation : ComponentValidationHandler() {
                     val text = (cb.item as JBCheckBox).text
                     if (valueList.contains(text)) valueList.remove(text) else valueList.add(text)
                     val isActive = condition.evaluate(valueList)
-                    helper.isActive = isActive
-                    row.enabled(isActive)
-                    row.visible(isActive)
+                    checkVisibility(helper, isActive, row)
                     dependsOn.variableValues.addAll(valueList)
                 }
                 if (component.isSelected) enabled.add(component.text)
             }
 
             val isActive = condition.evaluate(enabled)
-            helper.isActive = isActive
-            row.enabled(isActive)
-            row.visible(isActive)
+            checkVisibility(helper, isActive, row)
             return row
         }
 
         return checkNext(helper, row)
     }
+}
+
+private fun checkVisibility(helper: Helper, isActive: Boolean, row: Row) {
+    helper.isActive = isActive
+    row.enabled(isActive)
+    row.visible(isActive)
 }
 
 

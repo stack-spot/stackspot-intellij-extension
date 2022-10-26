@@ -40,76 +40,78 @@ data class Condition(val variable: String, val operator: String, var value: Any)
             variableValue.toString() != value.toString()
 
         private fun gt(variableValue: Any, value: Any): Boolean {
-            variableValue as String
-            val longValue = variableValue.toLongOrNull()
-            val conditionValue = value.toString().toLongOrNull()
-            if (longValue != null && conditionValue != null) {
-                return variableValue.toLong() > conditionValue
-            }
-            return false
+            return runOperatorWithLong(variableValue, value) { v1, v2 -> v1 > v2 }
         }
-
 
         private fun lt(variableValue: Any, value: Any): Boolean {
-            variableValue as String
-            val longValue = variableValue.toLongOrNull()
-            val conditionValue = value.toString().toLongOrNull()
-            if (longValue != null && conditionValue != null) {
-                return variableValue.toLong() < conditionValue
-            }
-            return false
+            return runOperatorWithLong(variableValue, value) { v1, v2 -> v1 < v2 }
         }
 
-
         private fun gte(variableValue: Any, value: Any): Boolean {
-            variableValue as String
-            val longValue = variableValue.toLongOrNull()
-            val conditionValue = value.toString().toLongOrNull()
-            if (longValue != null && conditionValue != null) {
-                return variableValue.toLong() >= conditionValue
-            }
-            return false
+            return runOperatorWithLong(variableValue, value) { v1, v2 -> v1 >= v2 }
         }
 
         private fun lte(variableValue: Any, value: Any): Boolean {
-            variableValue as String
-            val longValue = variableValue.toLongOrNull()
-            val conditionValue = value.toString().toLongOrNull()
-            if (longValue != null && conditionValue != null) {
-                return variableValue.toLong() <= conditionValue
-            }
-            return false
+            return runOperatorWithLong(variableValue, value) { v1, v2 -> v1 <= v2 }
         }
 
         private fun containsAny(variableValue: Any, value: Any): Boolean {
-            variableValue as Set<*>
-            return when (value) {
-                is String -> variableValue.contains(value)
-                else -> (value as ArrayList<*>).any { s -> variableValue.contains(s) }
+            return when {
+                variableValue is String && value is ArrayList<*> -> value.any { v ->
+                    (variableValue.toMutableSet()).contains(v)
+                }
+
+                variableValue is String && value is String -> variableValue.contains(value)
+                variableValue is Set<*> && value is String -> variableValue.contains(value)
+                else -> (value as ArrayList<*>).any { v -> (variableValue as Set<*>).contains(v) }
             }
         }
 
         private fun containsAll(variableValue: Any, value: Any): Boolean {
-            variableValue as Set<*>
-            return when (value) {
-                is String -> variableValue.contains(value)
-                else -> variableValue.containsAll(value as ArrayList<*>)
+            return when {
+                variableValue is String && value is ArrayList<*> -> variableValue.toMutableSet().containsAll(value)
+                variableValue is String && value is String -> variableValue == value
+                variableValue is Set<*> && value is String -> variableValue.containsAll(value.toMutableSet())
+                else -> (variableValue as Set<*> ).containsAll(value as ArrayList<*>)
             }
         }
 
         private fun containsOnly(variableValue: Any, value: Any): Boolean {
-            variableValue as Set<*>
-            return when (value) {
-                is String -> {
-                    val valueList = mutableSetOf<String>()
-                    valueList.add(value)
-                    variableValue.toString() == valueList.toString()
+            return when {
+                variableValue is Set<*> && value is String -> {
+                    variableValue.toString() == value.toMutableSet().toString()
                 }
+
+                variableValue is String && value is String -> {
+                    variableValue == value
+                }
+
+                variableValue is String && value is ArrayList<*> -> {
+                    variableValue.toMutableSet().toString() == value.toString()
+                }
+
                 else -> {
+                    variableValue as Set<*>
                     value as ArrayList<*>
                     variableValue.naturalSorted().toString() == value.naturalSorted().toString()
                 }
             }
+        }
+
+        private fun String.toMutableSet(): MutableSet<String> {
+            val valueList = mutableSetOf<String>()
+            valueList.add(this)
+            return valueList
+        }
+
+        private fun runOperatorWithLong(variableValue: Any, value: Any, lambda: (Long, Long) -> Boolean): Boolean {
+            variableValue as String
+            val longValue = variableValue.toLongOrNull()
+            val conditionValue = value.toString().toLongOrNull()
+            if (longValue != null && conditionValue != null) {
+                return lambda(variableValue.toLong(), conditionValue)
+            }
+            return false
         }
     }
 
