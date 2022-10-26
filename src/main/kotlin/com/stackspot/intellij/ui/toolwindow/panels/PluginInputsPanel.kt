@@ -27,14 +27,15 @@ import com.stackspot.model.component.MultiselectHelper
 import javax.swing.JComponent
 
 class PluginInputsPanel(
-    private val plugin: Plugin,
     project: Project? = null,
+    private val plugin: Plugin,
+    private val windowTitle: String,
     val variablesMap: MutableMap<String, Any> = mutableMapOf(),
     private val helpers: MutableList<Helper> = mutableListOf()
 ) : DialogWrapper(project, true) {
 
     init {
-        title = plugin.description
+        title = windowTitle
         init()
     }
 

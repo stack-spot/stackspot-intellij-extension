@@ -122,7 +122,8 @@ class StackSpotCellRenderer(val tree: AbstractStackSpotTree) : DefaultTreeCellRe
 
             if (stackSpotNode.stack != null && stackSpotNode.plugin != null && project != null) {
                 if (stackSpotNode.plugin.inputs != null) {
-                    val pluginInputPanel = PluginInputsPanel(stackSpotNode.plugin, project)
+                    val title = "${stackSpotNode.stack}/${stackSpotNode.plugin}"
+                    val pluginInputPanel = PluginInputsPanel(project, stackSpotNode.plugin, title)
                     val isOkExit = pluginInputPanel.showAndGet()
                     if (isOkExit) {
                         val inputValueAsFlags = extractVarsToCmd(pluginInputPanel.variablesMap)
