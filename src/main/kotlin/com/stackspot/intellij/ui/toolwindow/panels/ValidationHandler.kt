@@ -18,18 +18,18 @@ package com.stackspot.intellij.ui.toolwindow.panels
 
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.components.JBCheckBox
-import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.Row
 import com.stackspot.model.Condition
 import com.stackspot.model.component.Helper
 import java.awt.event.ItemListener
 import javax.swing.JComboBox
+import javax.swing.JTextField
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 
 class ValidationHandler {
 
-    private var handler: ComponentValidationHandler = DependentValidation()
+    private var handler: ComponentValidationHandler = DependencyValidation()
 
     init {
         handler
@@ -88,7 +88,7 @@ class CheckBoxGroupValidation : ComponentValidationHandler() {
     }
 }
 
-class DependentValidation : ComponentValidationHandler() {
+class DependencyValidation : ComponentValidationHandler() {
 
     override fun check(helper: Helper, row: Row): Row? {
         val component = (helper.dependsOn.firstOrNull()
@@ -96,12 +96,11 @@ class DependentValidation : ComponentValidationHandler() {
         val condition = helper.input.condition
 
         if (component != null && condition != null) {
-            helper.components.forEach { c ->
-                c.validationOnApply {
-                    if (!component.isVisible && it.isVisible) {
-                        ValidationInfo("This component has depends on ${condition.variable}")
-                    } else null
-                }
+            val fields = helper.checkBoxList.ifEmpty { helper.components }.first()
+            fields.validationOnApply {
+                if (!component.isVisible && it.isVisible) {
+                    ValidationInfo("This component has depends on the field ${condition.variable}")
+                } else null
             }
         }
 
@@ -138,7 +137,7 @@ class TextValidation : ComponentValidationHandler() {
     override fun check(helper: Helper, row: Row): Row? {
         val component = helper.dependsOn.first()?.component
         val condition = helper.input.condition
-        if (component is JBTextField && condition != null) {
+        if (component is JTextField && condition != null) {
             component.document.addDocumentListener(TextFieldListener(component, condition, row, helper))
             val isActive = condition.evaluate(component.text)
             helper.isActive = isActive
@@ -187,7 +186,7 @@ class MultiselectValidation : ComponentValidationHandler() {
 
 
 class TextFieldListener(
-    private val textField: JBTextField,
+    private val textField: JTextField,
     private val condition: Condition,
     private val row: Row,
     private val helper: Helper

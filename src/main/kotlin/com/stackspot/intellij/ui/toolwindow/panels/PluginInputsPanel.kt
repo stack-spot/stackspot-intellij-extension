@@ -62,7 +62,8 @@ class PluginInputsPanel(
             "int" to IntComponent(),
             "text" to TextComponent(),
             "multiselect" to MultiselectComponent(),
-            "list" to ListComponent()
+            "list" to ListComponent(),
+            "password" to PasswordComponent()
         )
 
         val strategy = strategyMap[helper.input.typeValue]

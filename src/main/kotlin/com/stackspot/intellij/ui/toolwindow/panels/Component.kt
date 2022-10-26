@@ -28,6 +28,8 @@ import com.stackspot.model.component.Helper
 import org.apache.commons.lang3.StringUtils
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
+import javax.swing.JPasswordField
+import javax.swing.JTextField
 
 interface ComponentType {
     fun create(helper: Helper): Row
@@ -117,7 +119,7 @@ class TextComponent : ComponentType {
 
 private const val INPUT_INVALID_REGEX = "Input is invalid for regex:"
 
-private fun validatePattern(field: Cell<JBTextField>, input: Input) {
+private fun validatePattern(field: Cell<JTextField>, input: Input) {
     val pattern = input.pattern?.toRegex()
     val checkPattern = pattern?.let {
         validationTextErrorIf("$INPUT_INVALID_REGEX $pattern") {
@@ -142,6 +144,21 @@ class ListComponent : ComponentType {
 
     }
 }
+
+class PasswordComponent : ComponentType {
+    override fun create(helper: Helper): Row {
+        val passwordField = JPasswordField(COLUMNS_SHORT)
+        return helper.panel.row(helper.input.label) {
+            val field = cell(passwordField)
+                .bindText(getterString(helper)) { helper.addValues(it) }
+                .comment(helper.input.help)
+            validatePattern(field, helper.input)
+            helper.components.add(field)
+        }
+    }
+}
+
+
 
 private fun getterBoolean(
     helper: Helper,
