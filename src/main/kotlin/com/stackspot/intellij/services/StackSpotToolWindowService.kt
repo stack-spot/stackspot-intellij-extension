@@ -53,7 +53,7 @@ class StackSpotToolWindowService {
 
     private fun reloadHistoryData() {
         val appliedTemplates = history?.appliedTemplates
-        if (appliedTemplates != null) {
+        if (!appliedTemplates.isNullOrEmpty()) {
             template = appliedTemplates.first()
             appliedPlugins = appliedTemplates.subList(1, appliedTemplates.size)
         }
