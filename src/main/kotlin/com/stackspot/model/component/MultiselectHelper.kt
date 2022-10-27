@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-package com.stackspot.model
+package com.stackspot.model.component
 
-import com.fasterxml.jackson.annotation.JsonProperty
+import com.intellij.ui.dsl.builder.Cell
+import com.stackspot.model.Input
+import javax.swing.JCheckBox
+import javax.swing.JComponent
 
-class Plugin(
-    override val name: String,
-    override val description: String,
-    override val types: List<String>,
-    override val inputs: List<Input>?,
-    override val displayName: String?,
-    @JsonProperty("display-name") override val displayNameKebab: String?,
-    val requirements: List<String>? = listOf(),
-) : Template(name, description, types, inputs, displayName, displayNameKebab)
+data class MultiselectHelper(
+    val variableValues: MutableSet<Any>,
+    val checkBoxList: MutableSet<Cell<JCheckBox>>,
+    val components: MutableSet<Cell<JComponent>>,
+    val input: Input
+)
+
+

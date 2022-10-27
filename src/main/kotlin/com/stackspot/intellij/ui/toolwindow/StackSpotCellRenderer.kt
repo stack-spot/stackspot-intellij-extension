@@ -16,21 +16,26 @@
 
 package com.stackspot.intellij.ui.toolwindow
 
+import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.IconLoader
 import com.intellij.ui.ColorUtil
 import com.intellij.util.ui.UIUtil
-import com.stackspot.intellij.commands.CommandRunner
+import com.stackspot.intellij.commands.listeners.NotifyStackSpotToolWindow
 import com.stackspot.intellij.commands.listeners.NotifyStacksUpdatedCommandListener
 import com.stackspot.intellij.commands.stk.ApplyPlugin
 import com.stackspot.intellij.commands.stk.DeleteStack
 import com.stackspot.intellij.commands.stk.UpdateStack
 import com.stackspot.intellij.ui.Icons
+import com.stackspot.intellij.ui.toolwindow.panels.PluginInputsPanel
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
 import java.awt.Dimension
 import javax.swing.*
 import javax.swing.tree.DefaultTreeCellRenderer
+
+private const val COULD_NOT_APPLY_PLUGIN = "Could not apply plugin"
+private const val PLUGIN_HAS_DEPENDENCY = "This plugin has dependencies. First, apply these before proceeding:"
 
 class StackSpotCellRenderer(val tree: AbstractStackSpotTree) : DefaultTreeCellRenderer() {
 
@@ -106,18 +111,29 @@ class StackSpotCellRenderer(val tree: AbstractStackSpotTree) : DefaultTreeCellRe
     ): JButton {
         val button = createButton("Apply Plugin", getIcon(Icons.APPLY_PLUGIN, selected, true))
         button.addActionListener {
+            if (stackSpotNode.hasPluginDependency()) {
+                val requirements = stackSpotNode.pluginsNotAppliedToString()
+                Messages.showWarningDialog("$PLUGIN_HAS_DEPENDENCY\n$requirements", COULD_NOT_APPLY_PLUGIN)
+                return@addActionListener
+            }
+
             val stackSpotTree = (tree as AbstractStackSpotTree)
             val project = stackSpotTree.service.project
+
             if (stackSpotNode.stack != null && stackSpotNode.plugin != null && project != null) {
-                ApplyPlugin(
-                    stackSpotNode.stack,
-                    stackSpotNode.plugin,
-                    project,
-                ).run(object : CommandRunner.CommandEndedListener {
-                    override fun notifyEnded() {
-                        stackSpotTree.notifyChange()
+                if (stackSpotNode.plugin.inputs != null) {
+                    val title = "${stackSpotNode.stack}/${stackSpotNode.plugin}"
+                    val pluginInputPanel = PluginInputsPanel(project, stackSpotNode.plugin, title)
+                    val isOkExit = pluginInputPanel.showAndGet()
+                    if (isOkExit) {
+                        val inputValueAsFlags = extractVarsToCmd(pluginInputPanel.variablesMap)
+                        val applyPluginCmd =
+                            ApplyPlugin(stackSpotNode.stack, stackSpotNode.plugin, project, inputValueAsFlags)
+                        applyPluginCmd.run(NotifyStackSpotToolWindow(tree))
                     }
-                })
+                } else {
+                    ApplyPlugin(stackSpotNode.stack, stackSpotNode.plugin, project).run(NotifyStackSpotToolWindow(tree))
+                }
             }
         }
         return button
@@ -130,10 +146,8 @@ class StackSpotCellRenderer(val tree: AbstractStackSpotTree) : DefaultTreeCellRe
     }
 
     private fun getLabelForeground(selected: Boolean, focused: Boolean): Color {
-        if (UIUtil.isUnderIntelliJLaF()) {
-            if (!selected && focused || selected && !focused) {
-                return UIUtil.getTreeForeground(true, true)
-            }
+        if (UIUtil.isUnderIntelliJLaF() && (!selected && focused || selected && !focused)) {
+            return UIUtil.getTreeForeground(true, true)
         }
         return UIUtil.getTreeForeground(selected, focused)
     }
@@ -141,7 +155,13 @@ class StackSpotCellRenderer(val tree: AbstractStackSpotTree) : DefaultTreeCellRe
     private fun createIcon(stackSpotNode: StackSpotTreeNode, selected: Boolean, focused: Boolean) {
         if (stackSpotNode.icon != null) {
             val icon = getIcon(stackSpotNode.icon, selected, focused)
-            panel.add(JLabel(icon), BorderLayout.WEST)
+            val jLabel = JLabel(icon)
+            if (stackSpotNode.plugin != null && stackSpotNode.hasPluginDependency()) {
+                jLabel.toolTipText =
+                    "This plugin has dependencies. First, apply these before proceeding: <br>" +
+                            "${stackSpotNode.pluginsNotAppliedToString(isHtml = true)}"
+            }
+            panel.add(jLabel, BorderLayout.WEST)
         }
     }
 
@@ -199,5 +219,18 @@ class StackSpotCellRenderer(val tree: AbstractStackSpotTree) : DefaultTreeCellRe
         button.toolTipText = tooltipText
         button.isContentAreaFilled = false
         return button
+    }
+
+    private fun extractVarsToCmd(varsMap: Map<String, Any>): Array<String> {
+        val args = mutableListOf<String>()
+        varsMap.forEach { (key, value) ->
+            if (value is Set<*>) {
+                value.forEach { elem -> args.add("--$key $elem") }
+            } else {
+                args.add("--$key $value")
+            }
+        }
+
+        return args.toTypedArray()
     }
 }

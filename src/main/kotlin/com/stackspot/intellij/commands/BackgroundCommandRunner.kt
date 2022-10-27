@@ -54,7 +54,7 @@ class BackgroundCommandRunner : CommandRunner {
     override fun runSync(commandLine: List<String>, workingDir: String?): BackgroundCommandRunner {
         return singleThread {
             var done = false
-            this.run(commandLine, object : CommandRunner.CommandEndedListener {
+            run(commandLine, object : CommandRunner.CommandEndedListener {
                 override fun notifyEnded() {
                     done = true
                 }

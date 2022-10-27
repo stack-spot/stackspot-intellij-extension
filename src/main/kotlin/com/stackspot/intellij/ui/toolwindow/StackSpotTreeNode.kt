@@ -26,4 +26,19 @@ open class StackSpotTreeNode(
     val icon: Icon? = null,
     val stack: Stack? = null,
     val plugin: Plugin? = null,
-) : DefaultMutableTreeNode(userObject)
+    private val pluginsNotApplied: List<String>? = null
+) : DefaultMutableTreeNode(userObject) {
+
+    fun hasPluginDependency(): Boolean {
+        return pluginsNotApplied?.isNotEmpty() ?: false
+    }
+
+    fun pluginsNotAppliedToString(isHtml: Boolean  = false): StringBuilder {
+        val newLine = if (isHtml) "<br>" else "\n"
+        val stringBuilder = StringBuilder()
+        pluginsNotApplied?.forEach { pa ->
+            stringBuilder.append("- $pa $newLine")
+        }
+        return stringBuilder
+    }
+}
