@@ -35,7 +35,9 @@ class AvailablePluginsTreeNode(private val service: StackSpotToolWindowService) 
             val stackNode = StackSpotTreeNode(stack, null, stack, null)
             add(stackNode)
             plugins.forEach { plugin ->
-                val pluginNode = StackSpotTreeNode(plugin, null, stack, plugin)
+                val pluginsNotApplied = service.pluginsOrTemplatesNotApplied(plugin.requirements)
+                val icon = if (pluginsNotApplied.isNotEmpty()) Icons.DEPENDENCY_WARNING else null
+                val pluginNode = StackSpotTreeNode(plugin, icon, stack, plugin, pluginsNotApplied)
                 stackNode.add(pluginNode)
             }
         }

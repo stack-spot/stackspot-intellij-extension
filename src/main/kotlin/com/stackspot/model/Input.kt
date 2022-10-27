@@ -16,13 +16,34 @@
 
 package com.stackspot.model
 
-data class Input(val type: String, val label: String, val name: String, val default: Any?, val condition: Condition?) {
+import com.intellij.util.containers.isNullOrEmpty
+import org.apache.commons.lang3.StringUtils
 
-    fun convert(value: String): Comparable<*> {
-        return when (type) {
-            "bool" -> value.toBoolean()
-            "int" -> value.toInt()
-            else -> value
+data class Input(
+    val type: String,
+    val label: String,
+    val name: String,
+    val default: Any?,
+    val condition: Condition?,
+    val required: Boolean = false,
+    val items: Set<String>? = null,
+    val pattern: String? = null,
+    val help: String? = null
+) {
+
+    val typeValue: String
+        get() {
+            return if (type == "text" && !items.isNullOrEmpty()) "list" else type
         }
+
+    fun containsDefaultValue(value: String): Boolean {
+        if (default == null) return false
+        default as List<*>
+        return default.contains(value)
     }
+
+    fun getDefaultBoolean(): Boolean = default as? Boolean ?: false
+
+    fun getDefaultString(): String = default?.toString() ?: StringUtils.EMPTY
+
 }

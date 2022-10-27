@@ -51,12 +51,10 @@ class BackgroundCommandRunner(private var workingDir: String? = null) : CommandR
     private fun replaceStdout(stdout: String) =
         stdout.replace("\\n".toRegex(), "")
 
-    override fun runSync(
-        commandLine: List<String>
-    ): BackgroundCommandRunner {
+    override fun runSync(commandLine: List<String>): BackgroundCommandRunner {
         return singleThread {
             var done = false
-            this.run(commandLine, object : CommandRunner.CommandEndedListener {
+            run(commandLine, object : CommandRunner.CommandEndedListener {
                 override fun notifyEnded() {
                     done = true
                 }

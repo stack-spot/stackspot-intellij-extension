@@ -14,16 +14,23 @@
  * limitations under the License.
  */
 
-package com.stackspot.model
+package com.stackspot.intellij.ui.toolwindow.panels
 
-import com.fasterxml.jackson.annotation.JsonProperty
+import com.intellij.ui.dsl.builder.Row
+import com.stackspot.model.component.Helper
 
-class Plugin(
-    override val name: String,
-    override val description: String,
-    override val types: List<String>,
-    override val inputs: List<Input>?,
-    override val displayName: String?,
-    @JsonProperty("display-name") override val displayNameKebab: String?,
-    val requirements: List<String>? = listOf(),
-) : Template(name, description, types, inputs, displayName, displayNameKebab)
+abstract class ComponentValidationHandler {
+
+    private var next: ComponentValidationHandler? = null
+
+    fun linkHandler(handler: ComponentValidationHandler): ComponentValidationHandler {
+        this.next = handler
+        return handler
+    }
+
+    abstract fun check(helper: Helper, row: Row): Row?
+
+    fun checkNext(helper: Helper, row: Row): Row? {
+        return next?.check(helper, row)
+    }
+}
