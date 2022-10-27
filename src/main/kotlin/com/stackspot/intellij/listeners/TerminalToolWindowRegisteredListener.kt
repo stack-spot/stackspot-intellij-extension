@@ -73,7 +73,10 @@ class TerminalToolWindowRegisteredListener : ToolWindowManagerListener {
                 LinkGradleProjectsToProjectListener(project),
                 LinkMavenProjectsToProjectListener(project)
             )
-            command.run(CompositeCommandEndedListener(listeners))
+            command.run(
+                CompositeCommandEndedListener(listeners),
+                workingDir = Path(project.basePath!!).parent.toString()
+            )
         }
     }
 }

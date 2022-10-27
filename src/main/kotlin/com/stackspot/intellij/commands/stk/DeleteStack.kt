@@ -23,5 +23,5 @@ import com.stackspot.model.Stack
 
 class DeleteStack(private val stack: Stack, private val project: Project) :
     BaseCommand(StackSpotTerminalRunner(project)) {
-    override fun commandLine() = listOf("stk", "delete", "stack", "${stack.name}")
+    override fun commandLine() = listOf("stk", "delete", "stack", stack.name)
 }

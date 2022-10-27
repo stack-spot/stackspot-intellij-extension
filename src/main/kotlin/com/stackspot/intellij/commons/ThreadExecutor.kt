@@ -23,7 +23,6 @@ import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
-
 fun <R : Any> singleThread(
     timeout: Long = 500L,
     unit: TimeUnit = TimeUnit.MILLISECONDS,

@@ -21,7 +21,6 @@ import com.stackspot.intellij.commands.BaseCommand
 import com.stackspot.intellij.ui.StackSpotTerminalRunner
 import com.stackspot.model.Stack
 
-class UpdateStack(private val stack: Stack, private val project: Project) :
-    BaseCommand(StackSpotTerminalRunner(project)) {
-    override fun commandLine() = listOf("stk", "update", "stack", "${stack.name}")
+class UpdateStack(private val stack: Stack, project: Project) : BaseCommand(StackSpotTerminalRunner(project)) {
+    override fun commandLine() = listOf("stk", "update", "stack", stack.name)
 }

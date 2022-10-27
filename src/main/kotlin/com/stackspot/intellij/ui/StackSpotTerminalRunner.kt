@@ -70,48 +70,45 @@ class StackSpotTerminalCommandMonitoringTask(
 
 private const val OPERATION_IS_NOT_SUPPORTED = "Operation is not supported"
 
-class StackSpotTerminalRunner(private val project: Project, private val workingDir: String? = null) : CommandRunner {
+class StackSpotTerminalRunner(private val project: Project) : CommandRunner {
 
     companion object {
         const val CMD_SEPARATOR = " "
         var commandSequence = 0
     }
 
-    override fun run(commandLine: List<String>, listener: CommandRunner.CommandEndedListener?) {
+    override fun run(commandLine: List<String>, listener: CommandRunner.CommandEndedListener?, workingDir: String?) {
         val toolWindowManager = ToolWindowManager.getInstance(project)
         val window = toolWindowManager.getToolWindow(TerminalToolWindowFactory.TOOL_WINDOW_ID)
         if (window != null) {
-            executeCommandInTerminal(window, listener, commandLine)
+            executeCommandInTerminal(window, listener, commandLine, workingDir)
         }
     }
 
-    override fun runSync(
-        commandLine: List<String>
-    ): BackgroundCommandRunner {
+    override fun runSync(commandLine: List<String>, workingDir: String?): BackgroundCommandRunner {
         throw UnsupportedOperationException(OPERATION_IS_NOT_SUPPORTED)
     }
 
-    override suspend fun runAsync(commandLine: List<String>): Deferred<BackgroundCommandRunner> {
+    override suspend fun runAsync(commandLine: List<String>, workingDir: String?): Deferred<BackgroundCommandRunner> {
         throw UnsupportedOperationException(OPERATION_IS_NOT_SUPPORTED)
     }
-
-    private fun resolveWorkingDir() = workingDir ?: project.basePath
 
     private fun executeCommandInTerminal(
         window: ToolWindow,
         listener: CommandRunner.CommandEndedListener?,
-        commandLine: List<String>
+        commandLine: List<String>,
+        workingDir: String?
     ) {
         window.show()
         val contentManager = window.contentManager
         val stackSpotTab = contentManager.contents.firstOrNull { Constants.MODULE_TYPE_NAME == it.tabName }
-        val workingDir = resolveWorkingDir()
+        val resolvedWorkingDir = workingDir ?: project.basePath
         val terminalView = TerminalView.getInstance(project)
         if (stackSpotTab != null) {
             terminalView.closeTab(stackSpotTab)
         }
-        val widget = getTerminalWidgetToRunCommand(terminalView, workingDir, contentManager)
-        executeCommand(widget, workingDir, commandLine, listener)
+        val widget = getTerminalWidgetToRunCommand(terminalView, resolvedWorkingDir, contentManager)
+        executeCommand(widget, resolvedWorkingDir, commandLine, listener)
     }
 
     private fun executeCommand(
@@ -133,10 +130,7 @@ class StackSpotTerminalRunner(private val project: Project, private val workingD
             )
             ProgressManager.getInstance().run(monitoringTask)
         } else {
-            shellWidget.executeCommand(
-                "cd $workDir && " +
-                        "${commandLine.joinToString(CMD_SEPARATOR)}"
-            )
+            shellWidget.executeCommand("cd $workDir && ${commandLine.joinToString(CMD_SEPARATOR)}")
         }
     }
 
@@ -170,8 +164,8 @@ class StackSpotTerminalRunner(private val project: Project, private val workingD
 
     private fun getSetStkChannelEnvironmentVariableCommand(): String {
         if (SystemInfo.isWindows) {
-            return "set ${CommandRunner.STK_CHANNEL_ENVIRONMENT_VARIABLE}=${CommandRunner.STK_CHANNLE_INTELLIJ}"
+            return "set ${CommandRunner.STK_CHANNEL_ENVIRONMENT_VARIABLE}=${CommandRunner.STK_CHANNEL_INTELLIJ}"
         }
-        return "export ${CommandRunner.STK_CHANNEL_ENVIRONMENT_VARIABLE}=${CommandRunner.STK_CHANNLE_INTELLIJ}"
+        return "export ${CommandRunner.STK_CHANNEL_ENVIRONMENT_VARIABLE}=${CommandRunner.STK_CHANNEL_INTELLIJ}"
     }
 }

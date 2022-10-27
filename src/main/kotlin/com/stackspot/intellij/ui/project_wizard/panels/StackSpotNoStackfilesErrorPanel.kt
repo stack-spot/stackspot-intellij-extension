@@ -76,7 +76,7 @@ class StackSpotNoStackfilesErrorPanel(val parentPanel: StackSpotParentPanel) {
 
         val executor = Executors.newSingleThreadExecutor()
         executor.submit {
-                ImportStack(url, BackgroundCommandRunner(Constants.Paths.STK_HOME.toString()))
+                ImportStack(url, BackgroundCommandRunner())
                     .run(NotifyProjectWizardImportedStack(parentPanel))
         }
         executor.shutdown()

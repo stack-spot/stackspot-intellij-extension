@@ -21,13 +21,12 @@ import com.stackspot.intellij.commands.BaseCommand
 import com.stackspot.intellij.ui.StackSpotTerminalRunner
 import com.stackspot.model.Stack
 import com.stackspot.model.Stackfile
-import kotlin.io.path.Path
 
 class CreateProjectByStackfile(
     private val project: Project,
     private val stack: Stack,
     private val stackfile: Stackfile
-) : BaseCommand(StackSpotTerminalRunner(project, Path(project.basePath!!).parent.toString())) {
+) : BaseCommand(StackSpotTerminalRunner(project)) {
 
     override fun commandLine(): List<String> {
         return listOf(

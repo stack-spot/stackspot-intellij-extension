@@ -44,7 +44,7 @@ internal class BackgroundCommandRunnerTest {
         every { ExecUtil.execAndGetOutput(any()) } returns ProcessOutput("OK", "", 0, false, false)
 
         //Act
-        val backgroundCommandRunner = BackgroundCommandRunner("")
+        val backgroundCommandRunner = BackgroundCommandRunner()
         backgroundCommandRunner.run(commandLine)
 
         //Assert
@@ -67,7 +67,7 @@ internal class BackgroundCommandRunnerTest {
         every { listener.notifyEnded() } just Runs
 
         //Act
-        val backgroundCommandRunner = BackgroundCommandRunner("")
+        val backgroundCommandRunner = BackgroundCommandRunner()
         backgroundCommandRunner.run(commandLine, listener)
 
         //Assert
@@ -91,7 +91,7 @@ internal class BackgroundCommandRunnerTest {
         every { ExecUtil.execAndGetOutput(any()) } returns ProcessOutput("", "ERROR", 1, false, false)
 
         //Act
-        val backgroundCommandRunner = BackgroundCommandRunner("")
+        val backgroundCommandRunner = BackgroundCommandRunner()
         backgroundCommandRunner.run(commandLine)
 
         //Assert
@@ -120,6 +120,7 @@ internal class BackgroundCommandRunnerTest {
         runSync.cancelled shouldBe false
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @ParameterizedTest
     @MethodSource("stdoutArgs")
     fun `when executing the coroutines function, it must not return error`(stdout: String) = runTest {
