@@ -14,16 +14,13 @@
  * limitations under the License.
  */
 
-package com.stackspot.model
+package com.stackspot.intellij.commands.listeners
 
-import com.fasterxml.jackson.annotation.JsonProperty
+import com.stackspot.intellij.commands.CommandRunner
+import com.stackspot.intellij.ui.toolwindow.AbstractStackSpotTree
 
-class Plugin(
-    override val name: String,
-    override val description: String,
-    override val types: List<String>,
-    override val inputs: List<Input>?,
-    override val displayName: String?,
-    @JsonProperty("display-name") override val displayNameKebab: String?,
-    val requirements: List<String>? = listOf(),
-) : Template(name, description, types, inputs, displayName, displayNameKebab)
+class NotifyStackSpotToolWindow(private val tree: AbstractStackSpotTree) : CommandRunner.CommandEndedListener {
+    override fun notifyEnded() {
+        tree.notifyChange()
+    }
+}

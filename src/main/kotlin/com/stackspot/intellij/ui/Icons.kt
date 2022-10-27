@@ -51,4 +51,7 @@ object Icons {
 
     @JvmField
     val WARNING = IconLoader.getIcon("/images/warning.svg", javaClass)
+
+    @JvmField
+    val DEPENDENCY_WARNING = IconLoader.getIcon("/images/dependency_warning.svg", javaClass)
 }
