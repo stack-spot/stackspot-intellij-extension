@@ -18,12 +18,10 @@ package com.stackspot.intellij.ui.toolwindow.panels
 
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.openapi.ui.validation.CHECK_NON_EMPTY
-import com.intellij.openapi.ui.validation.validationTextErrorIf
 import com.intellij.ui.UIBundle
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.*
 import com.intellij.util.MathUtil
-import com.stackspot.model.Input
 import com.stackspot.model.component.Helper
 import org.apache.commons.lang3.StringUtils
 import java.awt.event.KeyAdapter
@@ -63,34 +61,38 @@ class IntComponent : ComponentType {
             val field = textField()
                 .bindText(getterString(helper)) { helper.addValues(it) }
                 .comment(helper.input.help)
-            validatePattern(field, helper.input)
+            validateRequired(helper, field)
+            validatePattern(helper, field)
             validateIfInputIsNumber(field)
             field.columns(COLUMNS_SIZE)
-            field.component.addKeyListener(object : KeyAdapter() {
-                override fun keyPressed(e: KeyEvent?) {
-                    val text = field.component.text
-                    if (text.length >= MAX_TEXT_LENGTH && text.toIntOrNull() != null) {
-                        var value = text.toIntOrNull()
-                        value = value?.let { MathUtil.clamp(it, 0, 9999999) }
-                        field.component.text = ""
-                        field.component.text = value.toString()
-                        e?.consume()
-                    }
-                }
-            })
+            validateNumericFieldSize(field)
             helper.components.add(field)
         }
     }
 
+    private fun validateNumericFieldSize(field: Cell<JBTextField>) {
+        field.component.addKeyListener(object : KeyAdapter() {
+            override fun keyPressed(e: KeyEvent?) {
+                val text = field.component.text
+                if (text.length >= MAX_TEXT_LENGTH && text.toIntOrNull() != null) {
+                    var value = text.toIntOrNull()
+                    value = value?.let { MathUtil.clamp(it, 0, 9999999) }
+                    field.component.text = ""
+                    field.component.text = value.toString()
+                    e?.consume()
+                }
+            }
+        })
+    }
+
     private fun validateIfInputIsNumber(field: Cell<JBTextField>) {
-
         val regex = "^[0-9]*\$".toRegex()
-
-        val checkPattern = validationTextErrorIf(UIBundle.message(ENTER_A_NUMBER)) {
-            !regex.matches(it) && field.component.isVisible
+        field.validation {
+            val text: String = field.component.text
+            if (!regex.matches(text) && field.component.isVisible) {
+                ValidationInfo(UIBundle.message(ENTER_A_NUMBER), field.component)
+            } else null
         }
-
-        checkPattern.let { field.textValidation(it) }
     }
 }
 
@@ -114,25 +116,11 @@ class TextComponent : ComponentType {
             val field = textField()
                 .bindText(getterString(helper)) { helper.addValues(it) }
                 .comment(helper.input.help)
-            validatePattern(field, helper.input)
+            validatePattern(helper, field)
             helper.components.add(field)
         }
     }
 }
-
-private const val INPUT_INVALID_REGEX = "Input is invalid for regex:"
-
-private fun validatePattern(field: Cell<JTextField>, input: Input) {
-    val pattern = input.pattern?.toRegex()
-    val checkPattern = pattern?.let {
-        validationTextErrorIf("$INPUT_INVALID_REGEX $pattern") {
-            !pattern.matches(it) && field.component.isVisible
-        }
-    }
-    checkPattern?.let { field.textValidation(it) }
-    if (input.required) field.textValidation(CHECK_NON_EMPTY)
-}
-
 
 class ListComponent : ComponentType {
     override fun create(helper: Helper): Row {
@@ -155,13 +143,29 @@ class PasswordComponent : ComponentType {
             val field = cell(passwordField)
                 .bindText(getterString(helper)) { helper.addValues(it) }
                 .comment(helper.input.help)
-            validatePattern(field, helper.input)
+            validatePattern(helper, field)
             helper.components.add(field)
         }
     }
 }
 
+private const val INPUT_INVALID_REGEX = "Input is invalid for regex:"
 
+private fun validateRequired(helper: Helper, field: Cell<JBTextField>) {
+    if (helper.input.required) field.textValidation(CHECK_NON_EMPTY)
+}
+
+private fun validatePattern(helper: Helper, field: Cell<JTextField>) {
+    val pattern = helper.input.pattern?.toRegex()
+    pattern?.let {
+        field.validation {
+            val text: String = field.component.text
+            if (!pattern.matches(text) && field.component.isVisible) {
+                ValidationInfo("$INPUT_INVALID_REGEX $pattern", field.component)
+            } else null
+        }
+    }
+}
 
 private fun getterBoolean(
     helper: Helper,

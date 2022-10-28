@@ -17,7 +17,6 @@
 package com.stackspot.intellij.services
 
 import com.intellij.openapi.components.Service
-import com.intellij.util.containers.isNullOrEmpty
 import com.stackspot.intellij.commands.BackgroundCommandRunner
 import com.stackspot.intellij.commands.git.GitBranch
 import com.stackspot.intellij.commands.git.GitConfig

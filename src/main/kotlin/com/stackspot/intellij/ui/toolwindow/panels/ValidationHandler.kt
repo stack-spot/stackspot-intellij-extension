@@ -17,6 +17,7 @@
 package com.stackspot.intellij.ui.toolwindow.panels
 
 import com.intellij.openapi.ui.ValidationInfo
+import com.intellij.ui.DocumentAdapter
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.dsl.builder.Row
 import com.stackspot.model.Condition
@@ -181,20 +182,12 @@ class TextFieldListener(
     private val condition: Condition,
     private val row: Row,
     private val helper: Helper
-) : DocumentListener {
-    override fun insertUpdate(e: DocumentEvent?) {
+) : DocumentAdapter() {
+    override fun textChanged(e: DocumentEvent) {
         val text = textField.text
         val isVisible = condition.evaluate(text)
         helper.isActive = isVisible
         row.enabled(isVisible)
         row.visible(isVisible)
-    }
-
-    override fun removeUpdate(e: DocumentEvent?) {
-        insertUpdate(e)
-    }
-
-    override fun changedUpdate(e: DocumentEvent?) {
-        insertUpdate(e)
     }
 }
