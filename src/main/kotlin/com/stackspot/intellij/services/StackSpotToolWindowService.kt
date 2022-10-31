@@ -60,12 +60,8 @@ class StackSpotToolWindowService {
     }
 
     fun pluginsOrTemplatesNotApplied(plugins: List<String>? = null): List<String> {
-        /**
-         * Link to check: https://app.shortcut.com/stackspot/story/392379/ide-intellij-bug-valida%C3%A7%C3%A3o-requirement-em-apply-plugin-com-app-sem-template
-         */
-
         return plugins
-            ?.filter { p -> appliedPlugins.none { ap -> ap.templateDataPath == p } }
+            ?.filter { p -> appliedPlugins.none { ap -> ap.templateDataPath == p } && p != template?.templateDataPath }
             ?.toList() ?: listOf()
     }
 }
