@@ -16,7 +16,6 @@
 
 package com.stackspot.model
 
-import com.intellij.util.containers.isNullOrEmpty
 import org.apache.commons.lang3.StringUtils
 
 data class Input(
