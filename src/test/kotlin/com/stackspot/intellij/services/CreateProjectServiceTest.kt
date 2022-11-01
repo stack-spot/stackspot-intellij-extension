@@ -70,18 +70,24 @@ internal class CreateProjectServiceTest {
         @Test
         fun `service state should be STACKFILES_EMPTY`() {
             every { ImportedStacks.getInstance(any(), any(), any(), any()).hasStackFiles() } returns false
-            every { version.runSync().stdout } returns "stk version"
+            coEvery { version.runAsync().await().stdout } returns "stk version"
+            StkVersion.getInstance(version)
+            every { StkVersion.getInstance(any()).isInstalled() } returns true
+
             val service = CreateProjectService(version = version)
+
             service.state shouldBe ProjectWizardState.STACKFILES_EMPTY
             verify { ImportedStacks.getInstance(any(), any(), any(), any()).hasStackFiles() }
+            verify { StkVersion.getInstance(any()).isInstalled() }
             confirmVerified(ImportedStacks)
+            confirmVerified(StkVersion)
         }
 
         @Test
         fun `service state should be NOT_INSTALLED`() {
             coEvery { version.runAsync().await().stdout } returns ""
             StkVersion.getInstance(version)
-            coEvery { StkVersion.getInstance(any()).isInstalled() } returns false
+            every { StkVersion.getInstance(any()).isInstalled() } returns false
 
             val service = CreateProjectService(version = version)
 
@@ -93,9 +99,13 @@ internal class CreateProjectServiceTest {
         @Test
         fun `service state should be GIT_CONFIG_NOT_OK`() {
             every { ImportedStacks.getInstance(any(), any(), any(), any()).hasStackFiles() } returns true
-            every { version.runSync().stdout } returns "stk version"
+            coEvery { version.runAsync().await().stdout } returns "stk version"
+            StkVersion.getInstance(version)
+            every { StkVersion.getInstance(any()).isInstalled() } returns true
             every { (gitConfigCmd.runner as BackgroundCommandRunner).stdout } returns ""
+
             val service = CreateProjectService(gitConfigCmd = gitConfigCmd, version = version)
+
             service.state shouldBe ProjectWizardState.GIT_CONFIG_NOT_OK
             verify { ImportedStacks.getInstance(any(), any(), any(), any()).hasStackFiles() }
             verify { gitConfigCmd.run() }
@@ -109,6 +119,10 @@ internal class CreateProjectServiceTest {
             stackfile: Stackfile?,
             expected: Boolean
         ) {
+            coEvery { version.runAsync().await().stdout } returns "stk version"
+            StkVersion.getInstance(version)
+            every { StkVersion.getInstance(any()).isInstalled() } returns true
+
             val service = CreateProjectService().saveInfo(stack, stackfile)
             Assertions.assertEquals(service.isStackfileSelected(), expected)
         }
@@ -138,9 +152,13 @@ internal class CreateProjectServiceTest {
         @Test
         fun `service state should be OK`() {
             every { ImportedStacks.getInstance(any(), any(), any(), any()).hasStackFiles() } returns true
-            every { version.runSync().stdout } returns "stk version"
+            coEvery { version.runAsync().await().stdout } returns "stk version"
+            StkVersion.getInstance(version)
+            every { StkVersion.getInstance(any()).isInstalled() } returns true
             every { (gitConfigCmd.runner as BackgroundCommandRunner).stdout } returns "ok"
+
             val service = CreateProjectService(gitConfigCmd = gitConfigCmd, version = version)
+
             service.state shouldBe ProjectWizardState.OK
             verify { ImportedStacks.getInstance(any(), any(), any(), any()).hasStackFiles() }
             verify(exactly = 2) { gitConfigCmd.run() }
@@ -161,6 +179,10 @@ internal class CreateProjectServiceTest {
         @ParameterizedTest
         @MethodSource("saveInfoArgs")
         fun `should saveInfo when args aren't null`(stack: Stack?, stackfile: Stackfile?) {
+            coEvery { version.runAsync().await().stdout } returns "stk version"
+            StkVersion.getInstance(version)
+            every { StkVersion.getInstance(any()).isInstalled() } returns true
+
             val service = CreateProjectService().saveInfo(stack, stackfile)
             service.asClue {
                 it.stack shouldBe stack
@@ -171,6 +193,7 @@ internal class CreateProjectServiceTest {
         @ParameterizedTest
         @MethodSource("saveInfoNullArgs")
         fun `should saveInfo when args are null`(stack: Stack?, stackfile: Stackfile?) {
+
             val service = CreateProjectService().saveInfo(stack, stackfile)
             service.asClue {
                 it.stack shouldBe stack
@@ -185,6 +208,10 @@ internal class CreateProjectServiceTest {
             stackfile: Stackfile?,
             expected: Boolean
         ) {
+            coEvery { version.runAsync().await().stdout } returns "stk version"
+            StkVersion.getInstance(version)
+            every { StkVersion.getInstance(any()).isInstalled() } returns true
+
             val service = CreateProjectService().saveInfo(stack, stackfile)
             Assertions.assertEquals(service.isStackfileSelected(), expected)
         }
