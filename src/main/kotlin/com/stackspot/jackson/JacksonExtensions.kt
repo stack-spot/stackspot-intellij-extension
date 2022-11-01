@@ -76,8 +76,9 @@ inline fun <reified T> String.parseJsonToMapWithList(): HashMap<String, List<T>>
     return JacksonExtensions.objectMapperJson.readValue(content, typeRef)
 }
 
+const val SQUARE_BRACKETS = "[]"
 inline fun <reified T> String.parseJsonToList(): List<T> {
-    val content = if (this.contains(CURLY_BRACKETS)) "[]" else this
+    val content = if (this.contains(SQUARE_BRACKETS)) SQUARE_BRACKETS else this
     val typeRef: TypeReference<List<T>> = object : TypeReference<List<T>>() {}
     return JacksonExtensions.objectMapperJson.readValue(content, typeRef)
 }

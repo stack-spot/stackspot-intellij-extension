@@ -104,8 +104,14 @@ class ImportedStacksTest {
                     - stk cli successfully initialized!
                     {}
                 """
+        val stackStdout = """
+                    > Initializing stk cli...
+                    - stacks folder created!
+                    - stk cli successfully initialized!
+                    []
+                """
 
-        coEvery { stackInfoList.runAsync().await().stdout } returns stdout
+        coEvery { stackInfoList.runAsync().await().stdout } returns stackStdout
         coEvery { stackfileInfoList.runAsync().await().stdout } returns stdout
         coEvery { templateInfoList.runAsync().await().stdout } returns stdout
         coEvery { pluginInfoList.runAsync().await().stdout } returns stdout
