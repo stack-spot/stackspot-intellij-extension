@@ -26,7 +26,7 @@ data class Input(
     val default: Any?,
     val condition: Condition?,
     val required: Boolean = false,
-    val items: Set<String>? = null,
+    val items: List<String>? = null,
     val pattern: String? = null,
     val help: String? = null
 ) {

@@ -17,7 +17,6 @@
 package com.stackspot.model
 
 import com.intellij.openapi.ui.naturalSorted
-
 data class Condition(val variable: String, val operator: String, var value: Any) {
 
     companion object {
@@ -30,7 +29,9 @@ data class Condition(val variable: String, val operator: String, var value: Any)
             "<=" to ::lte,
             "containsAny" to ::containsAny,
             "containsAll" to ::containsAll,
-            "containsOnly" to ::containsOnly
+            "containsOnly" to ::containsOnly,
+            "notContainsAny" to ::notContainsAny,
+            "notContainsAll" to ::notContainsAll
         )
 
         private fun eq(variableValue: Any, value: Any): Boolean =
@@ -67,12 +68,33 @@ data class Condition(val variable: String, val operator: String, var value: Any)
             }
         }
 
+        private fun notContainsAny(variableValue: Any, value: Any): Boolean {
+            return when {
+                variableValue is String && value is ArrayList<*> -> value.none { v ->
+                    (variableValue.toMutableSet()).contains(v)
+                }
+
+                variableValue is String && value is String -> !variableValue.contains(value)
+                variableValue is Set<*> && value is String -> !variableValue.contains(value)
+                else -> (value as ArrayList<*>).none { v -> (variableValue as Set<*>).contains(v) }
+            }
+        }
+
         private fun containsAll(variableValue: Any, value: Any): Boolean {
             return when {
                 variableValue is String && value is ArrayList<*> -> variableValue.toMutableSet().containsAll(value)
                 variableValue is String && value is String -> variableValue == value
                 variableValue is Set<*> && value is String -> variableValue.containsAll(value.toMutableSet())
-                else -> (variableValue as Set<*> ).containsAll(value as ArrayList<*>)
+                else -> (variableValue as Set<*>).containsAll(value as ArrayList<*>)
+            }
+        }
+
+        private fun notContainsAll(variableValue: Any, value: Any): Boolean {
+            return when {
+                variableValue is String && value is ArrayList<*> -> !variableValue.toMutableSet().containsAll(value)
+                variableValue is String && value is String -> variableValue != value
+                variableValue is Set<*> && value is String -> !variableValue.containsAll(value.toMutableSet())
+                else -> !(variableValue as Set<*>).containsAll(value as ArrayList<*>)
             }
         }
 
