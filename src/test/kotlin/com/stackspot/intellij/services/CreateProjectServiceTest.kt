@@ -24,6 +24,7 @@ import com.stackspot.intellij.services.enums.ProjectWizardState
 import com.stackspot.model.ImportedStacks
 import com.stackspot.model.Stack
 import com.stackspot.model.Stackfile
+import com.stackspot.model.StkVersion
 import io.kotest.assertions.asClue
 import io.kotest.matchers.shouldBe
 import io.mockk.*
@@ -41,7 +42,7 @@ import java.util.stream.Stream
 internal class CreateProjectServiceTest {
 
     private val gitConfigCmd: GitConfig = mockk(relaxUnitFun = true)
-    private val version: Version = mockk(relaxUnitFun = true)
+    private val version: Version = mockk(relaxed = true)
     private val stackInfoList: CommandInfoList = mockk(relaxed = true)
     private val stackfileInfoList: CommandInfoList = mockk(relaxed = true)
     private val templateInfoList: CommandInfoList = mockk(relaxed = true)
@@ -52,6 +53,7 @@ internal class CreateProjectServiceTest {
         clearAllMocks()
         stubbing()
         ImportedStacks.getInstance(stackInfoList, stackfileInfoList, templateInfoList, pluginInfoList)
+        mockkObject(StkVersion)
         mockkObject(ImportedStacks)
     }
 
@@ -77,10 +79,15 @@ internal class CreateProjectServiceTest {
 
         @Test
         fun `service state should be NOT_INSTALLED`() {
-            every { version.runSync().stdout } returns ""
+            coEvery { version.runAsync().await().stdout } returns ""
+            StkVersion.getInstance(version)
+            coEvery { StkVersion.getInstance(any()).isInstalled() } returns false
+
             val service = CreateProjectService(version = version)
+
             service.state shouldBe ProjectWizardState.NOT_INSTALLED
-            verify { version.runSync() }
+            verify { StkVersion.getInstance(any()).isInstalled() }
+            confirmVerified(StkVersion)
         }
 
         @Test

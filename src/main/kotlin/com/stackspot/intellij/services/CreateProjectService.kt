@@ -24,19 +24,27 @@ import com.stackspot.intellij.services.enums.ProjectWizardState
 import com.stackspot.model.ImportedStacks
 import com.stackspot.model.Stack
 import com.stackspot.model.Stackfile
+import com.stackspot.model.StkVersion
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
-private const val STK_VERSION_MESSAGE = "stk version"
-
 @Service
 class CreateProjectService() {
+
+    init {
+        runBlocking {
+            launch { ImportedStacks.getInstance() }
+            launch { StkVersion.getInstance() }
+        }
+    }
 
     var stack: Stack? = null
     var stackfile: Stackfile? = null
     val state: ProjectWizardState
         get() {
-            return if (!isInstalled()) {
+            return if (!StkVersion.getInstance().isInstalled()) {
                 ProjectWizardState.NOT_INSTALLED
             } else if (!ImportedStacks.getInstance().hasStackFiles()) {
                 ProjectWizardState.STACKFILES_EMPTY
@@ -56,11 +64,6 @@ class CreateProjectService() {
     ) : this() {
         this.version = version
         this.gitConfigCmd = gitConfigCmd
-    }
-
-    private fun isInstalled(): Boolean {
-        val stdout = version.runSync().stdout
-        return stdout.contains(STK_VERSION_MESSAGE)
     }
 
     fun isStackfileSelected(): Boolean = stack != null && stackfile != null
