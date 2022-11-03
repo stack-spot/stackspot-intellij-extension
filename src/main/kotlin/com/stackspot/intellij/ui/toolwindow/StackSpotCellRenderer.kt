@@ -36,7 +36,6 @@ import javax.swing.tree.DefaultTreeCellRenderer
 
 private const val COULD_NOT_APPLY_PLUGIN = "Could not apply plugin"
 private const val PLUGIN_HAS_DEPENDENCY = "This plugin has dependencies. First, apply these before proceeding:"
-
 class StackSpotCellRenderer(val tree: AbstractStackSpotTree) : DefaultTreeCellRenderer() {
 
     private val panel = object : JPanel() {
@@ -232,12 +231,18 @@ class StackSpotCellRenderer(val tree: AbstractStackSpotTree) : DefaultTreeCellRe
         val args = mutableListOf<String>()
         varsMap.forEach { (key, value) ->
             if (value is Set<*>) {
-                value.forEach { elem -> args.add("--$key $elem") }
+                args.add("--$key ${extractSet(value)}")
             } else {
-                args.add("--$key $value")
+                args.add("--$key \"$value\"")
             }
         }
 
         return args.toTypedArray()
     }
+
+    private fun extractSet(set: Set<*>) : String {
+        val str = "$set".replace("[", "").replace("]", "")
+        return "\"$str\""
+    }
 }
+
