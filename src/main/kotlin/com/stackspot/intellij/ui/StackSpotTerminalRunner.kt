@@ -102,7 +102,7 @@ class StackSpotTerminalRunner(private val project: Project) : CommandRunner {
         window.show()
         val contentManager = window.contentManager
         val stackSpotTab = contentManager.contents.firstOrNull { Constants.MODULE_TYPE_NAME == it.tabName }
-        val resolvedWorkingDir = project.basePath ?: workingDir
+        val resolvedWorkingDir =  workingDir ?: project.basePath
         val terminalView = TerminalView.getInstance(project)
         if (stackSpotTab != null) {
             terminalView.closeTab(stackSpotTab)

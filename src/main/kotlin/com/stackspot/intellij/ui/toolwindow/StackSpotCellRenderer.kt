@@ -129,10 +129,17 @@ class StackSpotCellRenderer(val tree: AbstractStackSpotTree) : DefaultTreeCellRe
                         val inputValueAsFlags = extractVarsToCmd(pluginInputPanel.variablesMap)
                         val applyPluginCmd =
                             ApplyPlugin(stackSpotNode.stack, stackSpotNode.plugin, project, inputValueAsFlags)
-                        applyPluginCmd.run(NotifyStackSpotToolWindow(tree))
+                        applyPluginCmd.run(NotifyStackSpotToolWindow(tree), project.basePath)
                     }
                 } else {
-                    ApplyPlugin(stackSpotNode.stack, stackSpotNode.plugin, project).run(NotifyStackSpotToolWindow(tree))
+                    ApplyPlugin(
+                        stackSpotNode.stack,
+                        stackSpotNode.plugin,
+                        project
+                    ).run(
+                        NotifyStackSpotToolWindow(tree),
+                        project.basePath
+                    )
                 }
             }
         }
