@@ -1,4 +1,4 @@
-# StackSpot IntelliJ Plugin
+# **StackSpot IntelliJ Plugin**
 
 ## **Table of contents**
 
@@ -17,7 +17,7 @@
 
 ## **About**
 
-**StackSpot IntelliJ Plugin** is a plugin that extends [STK CLI](https://docs.stackspot.com/latest/docs/stk-cli/) to IntelliJ and allows you to create a StackSpot project, apply plugins, and many more features. But all this is inside of your favorite IDE.
+**StackSpot IntelliJ Plugin** extends [**STK CLI**](https://docs.stackspot.com.br/docs/stk-cli/) to IntelliJ and allows you to create a StackSpot project, apply plugins, and many more features.
 
 ## **Getting started**
 
@@ -28,9 +28,9 @@
 
 ### **Gradle Commands**
 
-Always use `./gradlew clean` to be sure that the change you made are in the last binary.
+You need to use **`./gradlew clean`** to make sure the changes you made are in the last binary. Now, follow:
 
-To build plugin to install in your IDE use:
+1. Build a plugin to install in your IDE, run:
 
 ```
 ./gradlew clean buildPlugin
@@ -38,7 +38,7 @@ To build plugin to install in your IDE use:
 
 The zip file will be in `build/distributions/{plugin_name}-{version}.zip`
 
-To run your code use:
+2. Run your code:
 
 ```
 ./gradlew clean runIde
@@ -46,8 +46,8 @@ To run your code use:
 
 ## **Installation**
 
-We will let this plugin available in JetBrains Marketplace, but if you want to install through the zip file check this:
-[IntelliJ install plugin from the disk](https://www.jetbrains.com/help/idea/managing-plugins.html#install_plugin_from_disk)
+This plugin is available on JetBrains Marketplace, but you can also install it through the zip file, see below:
+- [**Install IntelliJ plugin from the disk**](https://www.jetbrains.com/help/idea/managing-plugins.html#install_plugin_from_disk)
 
 ## **Usage**
 
@@ -57,7 +57,7 @@ Create a new project (Project Wizard):
   <a href="https://gifyu.com/image/STIbO"><img src="https://s4.gifyu.com/images/create-project-project-wizard.gif" alt="gif containing the creation of a project" border="0" /></a>
 </p>
 
-Using StackSpot tool window after project opened:
+Using StackSpot tool window after the project opened:
 
 <p align="center">
   <a href="https://gifyu.com/image/STIzK"><img src="https://s4.gifyu.com/images/overview-ide.gif" alt="gif containing the StackSpot tool window" border="0" /></a>
@@ -65,27 +65,27 @@ Using StackSpot tool window after project opened:
 
 ## **Documentation**
 
-Check our official documentation page to use StackSpot IntelliJ plugin:
-[Documentation link](https://docs.stackspot.com/latest/docs/extensions-for-ide/intellij/)
+See StackSpot's documentation to learn more about IntelliJ's plugin:
+- [**IntelliJ**](https://docs.stackspot.com.br/docs/extensions-for-ide/intellij/)
 
 ## **Contributing**
 
 Check out our [**Contributing Guide**](https://github.com/stack-spot/stackspot-intellij-extension/blob/main/CONTRIBUTING.md) to learn about our development process, how to suggest bug fixes and improvements.
 
-Check out other guides:
+See other guides:
 
 - [**Security**](https://github.com/stack-spot/stackspot-intellij-extension/blob/main/SECURITY.md)
 
 - [**Developer Guide**](https://github.com/stack-spot/stackspot-intellij-extension/blob/main/DEVELOPER_GUIDE.md)
 
 ## **Code of Conduct**
+
 Please follow the [**Code of Conduct**](https://github.com/stack-spot/stackspot-intellij-extension/blob/main/CODE_OF_CONDUCT.md) in all your interactions with our project.
 
 ## **License**
+
 [**Apache License 2.0**](https://github.com/stack-spot/stackspot-intellij-extension/blob/main/LICENSE).
 
 ## **Other information**
 
-### **IntelliJ Plugin SDK documentation**
-
-- https://plugins.jetbrains.com/docs/intellij/welcome.html
+- [**IntelliJ Plugin SDK documentation**](https://plugins.jetbrains.com/docs/intellij/welcome.html)
