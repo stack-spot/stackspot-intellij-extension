@@ -2,11 +2,28 @@
 
 ## Releases
 
-## [v1.0.0] - 2022-10-06
-<!-- Release notes generated using configuration in .github/release.yaml at release-1.0.0 -->
+## [v1.1.0] - 2022-11-11
+<!-- Release notes generated using configuration in .github/release.yaml at release-1.1.0 -->
 
 ### Exciting New Features 🎉
+* Feature: Refactored code to use list command from CLI with listing by json by @adroaldonetozup in https://github.com/stack-spot/stackspot-intellij-extension/pull/58
+* Feature: Created plugin input window and added plugin dependency functionality by @adroaldonetozup in https://github.com/stack-spot/stackspot-intellij-extension/pull/59
+* Feature: Removed mandatory template in stackfile by @adroaldonetozup in https://github.com/stack-spot/stackspot-intellij-extension/pull/61
+### Bug Fixes 🛠
+* Bug Fix: Documentation link in project wizard was not visible by @matheusferreirazup in https://github.com/stack-spot/stackspot-intellij-extension/pull/60
+* Bug Fix: Compatibility error in plugin check fixed by @adroaldonetozup in https://github.com/stack-spot/stackspot-intellij-extension/pull/63
+* Bug Fix: Remove template requirement validation by @matheusferreirazup in https://github.com/stack-spot/stackspot-intellij-extension/pull/64
+* Bug Fix: Added condition missing operators by @adroaldonetozup in https://github.com/stack-spot/stackspot-intellij-extension/pull/68
+* Bug Fix: Decreased the response time to select the Stackfile of the new project by @adroaldonetozup in https://github.com/stack-spot/stackspot-intellij-extension/pull/69
+
+
+Full Changelog: https://github.com/stack-spot/stackspot-intellij-extension/compare/v1.0.0...v1.1.0
+
+## [v1.0.0] - 2022-10-06
+<!-- Release notes generated using configuration in .github/release.yaml at release-1.0.0 -->
+### Exciting New Features 🎉
 * Feature: Improve code coverage with unit tests by @matheusferreirazup in https://github.com/stack-spot/stackspot-intellij-extension/pull/48
+
 ### Bug Fixes 🛠
 * Bug Fix: Add mock for git config command runner by @matheusferreirazup in https://github.com/stack-spot/stackspot-intellij-extension/pull/53
 
