@@ -1,4 +1,4 @@
-# StackSpot IntelliJ Plugin
+# **StackSpot IntelliJ Plugin**
 
 ## **Table of contents**
 
@@ -46,7 +46,7 @@ The zip file will be in `build/distributions/{plugin_name}-{version}.zip`
 
 ## **Installation**
 
-This plugin is available on JetBrains Marketplace, but if you can also install it through the zip file, see below:
+This plugin is available on JetBrains Marketplace, but you can also install it through the zip file, see below:
 - [**Install IntelliJ plugin from the disk**](https://www.jetbrains.com/help/idea/managing-plugins.html#install_plugin_from_disk)
 
 ## **Usage**
@@ -57,7 +57,7 @@ Create a new project (Project Wizard):
   <a href="https://gifyu.com/image/STIbO"><img src="https://s4.gifyu.com/images/create-project-project-wizard.gif" alt="gif containing the creation of a project" border="0" /></a>
 </p>
 
-Using StackSpot tool window after project opened:
+Using StackSpot tool window after the project opened:
 
 <p align="center">
   <a href="https://gifyu.com/image/STIzK"><img src="https://s4.gifyu.com/images/overview-ide.gif" alt="gif containing the StackSpot tool window" border="0" /></a>
@@ -65,23 +65,25 @@ Using StackSpot tool window after project opened:
 
 ## **Documentation**
 
-See StackSpot's documentation to learn more about the IntelliJ plugin:
+See StackSpot's documentation to learn more about IntelliJ's plugin:
 - [**IntelliJ**](https://docs.stackspot.com.br/docs/extensions-for-ide/intellij/)
 
 ## **Contributing**
 
 Check out our [**Contributing Guide**](https://github.com/stack-spot/stackspot-intellij-extension/blob/main/CONTRIBUTING.md) to learn about our development process, how to suggest bug fixes and improvements.
 
-Check out other guides:
+See other guides:
 
 - [**Security**](https://github.com/stack-spot/stackspot-intellij-extension/blob/main/SECURITY.md)
 
 - [**Developer Guide**](https://github.com/stack-spot/stackspot-intellij-extension/blob/main/DEVELOPER_GUIDE.md)
 
 ## **Code of Conduct**
+
 Please follow the [**Code of Conduct**](https://github.com/stack-spot/stackspot-intellij-extension/blob/main/CODE_OF_CONDUCT.md) in all your interactions with our project.
 
 ## **License**
+
 [**Apache License 2.0**](https://github.com/stack-spot/stackspot-intellij-extension/blob/main/LICENSE).
 
 ## **Other information**
