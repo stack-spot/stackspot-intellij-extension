@@ -11,7 +11,7 @@ plugins {
     id("org.sonarqube") version "3.4.0.2513"
 
     // Gradle Changelog Plugin
-    id("org.jetbrains.changelog") version "1.3.1"
+    id("org.jetbrains.changelog") version "2.2.0"
 }
 
 val projectVersion: String? = System.getProperty("project_version")
