@@ -30,7 +30,7 @@ repositories {
 dependencies {
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
-    testImplementation("io.mockk:mockk:1.13.1")
+    testImplementation("io.mockk:mockk:1.13.10")
     testImplementation("io.kotest:kotest-assertions-core:5.4.2")
     testImplementation("org.awaitility:awaitility-kotlin:4.2.0")
 }
